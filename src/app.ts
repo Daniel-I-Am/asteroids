@@ -8,19 +8,26 @@ class Ship {
         name: string, 
         color: string, 
         cannons: number, 
-        distanceTraveled: number,
     ) {
         this.name = name;
         this.cannons = cannons;
-        this.distanceTraveled = distanceTraveled;
+        this.distanceTraveled = 0;
     }
     
+    private addDistanceTraveled() {
+        this.distanceTraveled++;
+    }
+
+    private setCannons(amount: number) {
+        this.cannons = amount;
+    }
+
     public shoot() {
         console.log("I'm shooting");
     }
 
     public move() {
-        this.distanceTraveled++;
+        this.addDistanceTraveled();
         console.log(this.distanceTraveled);
     }
 }
