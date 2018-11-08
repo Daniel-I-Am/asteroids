@@ -4,14 +4,17 @@ class Ship {
     private cannons: number;
     private distanceTraveled: number;
 
-    public setName(name: string) {
+    public constructor(
+        name: string, 
+        color: string, 
+        cannons: number, 
+        distanceTraveled: number,
+    ) {
         this.name = name;
-    } 
-
-    public setCannons(amount: number) {
-        this.cannons = amount;
+        this.cannons = cannons;
+        this.distanceTraveled = distanceTraveled;
     }
-
+    
     public shoot() {
         console.log("I'm shooting");
     }
@@ -22,8 +25,7 @@ class Ship {
     }
 }
 
-let spaceShip: Ship = new Ship();
-spaceShip.color = "Gray";
+let spaceShip: Ship = new Ship("Nebuchadnezzar", "Gray", 35, 0);
 
 spaceShip.move();
 spaceShip.move();
