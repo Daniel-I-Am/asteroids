@@ -4,7 +4,7 @@ class Ship {
     private cannons: number;
     private distanceTraveled: number;
 
-    public setNames(name: string) {
+    public setName(name: string) {
         this.name = name;
     } 
 

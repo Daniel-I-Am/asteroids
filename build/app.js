@@ -1,5 +1,5 @@
 class Ship {
-    setNames(name) {
+    setName(name) {
         this.name = name;
     }
     setCannons(amount) {
