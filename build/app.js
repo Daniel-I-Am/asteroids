@@ -1,9 +1,12 @@
 class Ship {
-    constructor() {
-        this.distanceTraveled = 10000;
+    setNames(name) {
+        this.name = name;
+    }
+    setCannons(amount) {
+        this.cannons = amount;
     }
     shoot() {
-        console.log("I'm shsooting");
+        console.log("I'm shooting");
     }
     move() {
         this.distanceTraveled++;
@@ -11,9 +14,7 @@ class Ship {
     }
 }
 let spaceShip = new Ship();
-spaceShip.name = "Nebuchadnezzar";
 spaceShip.color = "Gray";
-spaceShip.cannons = 5;
 spaceShip.move();
 spaceShip.move();
 //# sourceMappingURL=app.js.map
