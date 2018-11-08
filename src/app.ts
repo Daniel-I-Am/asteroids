@@ -1,42 +1,22 @@
-class Animal
-{
-    private readonly name: string
-    private readonly legs: number
-    private readonly sound: string
+class Ship {
+    name: string;
+    color: string;
+    cannons: number;
+    private distanceTraveled: number = 10000;
 
-    public constructor(name: string, legs: number, sound: string)
-    {
-        this.name = name
-        this.legs = legs
-        this.sound = sound
+    shoot() {
+        console.log("I'm shsooting");
     }
-
-    public getName(): string
-    {
-        return this.name
-    }
-
-    public getLegs(): number
-    {
-        return this.legs
-    }
-
-    public getSound(): string
-    {
-        return this.sound
+    move() {
+        this.distanceTraveled++;
+        console.log(this.distanceTraveled);
     }
 }
 
-const animals = [
-     new Animal('dog', 4, 'woof'),
-     new Animal('cat', 4, 'meow')
-]
+let spaceShip: Ship = new Ship();
+spaceShip.name = "Nebuchadnezzar";
+spaceShip.color = "Gray";
+spaceShip.cannons = 5;
 
-animals.forEach(
-    (animal) => console.log(
-        'A %s has %s legs and goes %s!',
-        animal.getName(),
-        animal.getLegs(),
-        animal.getSound()
-    )
-)
+spaceShip.move()
+spaceShip.move()
