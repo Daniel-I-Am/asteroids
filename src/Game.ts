@@ -113,10 +113,13 @@ class Game {
 
     /**
      * Writes text to canvas
-     * @param text Text to write to canvas
-     * @param x X-coord to write at
-     * @param y Y-Coord to write at
-     * @param align Alignment to use when writing
+     * @param {string} text Text to write to canvas
+     * @param {number} x X-coord to write at
+     * @param {number} y Y-Coord to write at
+     * @param {number} fontSize fontsize to use
+     * @param {CanvasTextAlign} align Alignment to use when writing
+     * @param {string} fontFace fontface to use
+     * @param {string} color Color to use, default white
      */
     private writeText(text: string, x: number, y: number, fontSize: number, align: CanvasTextAlign = "left", fontFace: string = "Minecraft", color: string = "#ffffff") {
         this.ctx.fillStyle = color;
@@ -126,9 +129,12 @@ class Game {
     }
 
     /**
-     * Centers text at a give y-coordinate
-     * @param text Text to write to canvas
-     * @param y Y-Coord to center text at
+     * Center text at a given y-coordinate
+     * @param {string} text Text to write to canvas
+     * @param {number} y Y-Coord to center text
+     * @param {number} fontSize fontsize to use
+     * @param {string} fontFace fontface to use
+     * @param {string} color Color to use, default white
      */
     private centerText(text: string, y: number, fontSize: number, fontFace: string = "Minecraft", color: string = "#ffffff") {
         this.writeText(text, this.canvas.width/2, y, fontSize, "center", fontFace, color);
@@ -136,11 +142,11 @@ class Game {
 
     /**
      * 
-     * @param src src location of the desired image
-     * @param x X-location to put the center of the image
-     * @param y Y-location to put the center of the image
-     * @param {Function} [callback=null] callback function, executed once images has been loaded in and drawn on the screen
-     * @param {boolean} [shouldCenter=true] Whether the image should be put relative to it's center 
+     * @param {string} src src location of the desired image
+     * @param {number} x X-location to put the center of the image
+     * @param {number} y Y-location to put the center of the image
+     * @param {Function} callback callback function, executed once images has been loaded in and drawn on the screen
+     * @param {boolean} shouldCenter Whether the image should be put relative to it's center 
      */
     private addImage(src: string, x: number, y: number, callback: Function = null, shouldCenter: boolean = true) {
         let image: HTMLImageElement = new Image;
