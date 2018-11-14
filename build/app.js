@@ -26,15 +26,18 @@ class Game {
     start_screen() {
         let buttonOffset = 100;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.writeAsteroidHeading();
-        this.writeIntroText();
-        this.writeStartButton(buttonOffset);
-        this.drawMenuAsteroid();
+        this.centerText("Asteroids", 200, 192);
+        this.centerText("Press start to play", 400, 48);
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width / 2, this.canvas.height - buttonOffset, () => {
+            this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
+        });
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, this.canvas.height / 2);
     }
     level_screen() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawPlayerLives();
-        this.drawYourScore();
+        for (let i = 0; i < this.lives; i++)
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
+        this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         this.drawRandomAsteroids(10, 20);
         this.drawPlayerShip();
     }
@@ -69,26 +72,9 @@ class Game {
         });
         image.src = src;
     }
-    writeAsteroidHeading() {
-        this.centerText("Asteroids", 200, 192);
-    }
-    writeIntroText() {
-        this.centerText("Press start to play", 400, 48);
-    }
-    writeStartButton(buttonOffset) {
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width / 2, this.canvas.height - buttonOffset, () => {
-            this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
-        });
-    }
-    drawMenuAsteroid() {
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, this.canvas.height / 2);
-    }
     drawPlayerLives() {
-        for (let i = 0; i < this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
     }
     drawYourScore() {
-        this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
     }
     drawRandomAsteroids(min, max) {
         for (let i = this.randomNumber(min, max); i > 0; i--) {

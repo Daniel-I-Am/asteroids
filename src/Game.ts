@@ -59,13 +59,15 @@ class Game {
         //0. clear screen
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. add 'Asteroids' text
-        this.writeAsteroidHeading();
+        this.centerText("Asteroids", 200, 192);
         //2. add 'Press to play' text
-        this.writeIntroText();
+        this.centerText("Press start to play", 400, 48);
         //3. add button with 'start' text
-        this.writeStartButton(buttonOffset);
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width/2, this.canvas.height - buttonOffset, () => {
+            this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
+        });
         //4. add Asteroid image
-        this.drawMenuAsteroid();
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, this.canvas.height/2);
     }
 
     //-------- level screen methods -------------------------------------
@@ -76,13 +78,15 @@ class Game {
         //0. clear screen
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. load life images
-        this.drawPlayerLives();
+        for (let i = 0; i<this.lives; i++)
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
         //2. draw current score
-        this.drawYourScore();
+        this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         //3. draw random asteroids
-        this.drawRandomAsteroids(10, 20);
+        for (let i = this.randomNumber(min, max); i>0; i--)
+            this.drawRandomAsteroid();
         //4. draw player spaceship
-        this.drawPlayerShip();
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
     }
 
     //-------- Title screen methods -------------------------------------
@@ -94,7 +98,7 @@ class Game {
         //0. clear screen
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. draw your score
-        this.drawFinalScore();
+        this.centerText(`You died with ${this.score} points`, 100, 96);
         //2. draw all highscores
         this.drawHighScores();
     }
@@ -164,40 +168,6 @@ class Game {
 
     //---------Functions for drawing------------------------------------
 
-
-    private writeAsteroidHeading() {
-        this.centerText("Asteroids", 200, 192);
-    }
-
-    private writeIntroText() {
-        this.centerText("Press start to play", 400, 48);
-    }
-
-    private writeStartButton(buttonOffset: number) {
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width/2, this.canvas.height - buttonOffset, () => {
-            this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
-        });
-    }
-
-    private drawMenuAsteroid() {
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, this.canvas.height/2);
-    }
-
-    private drawPlayerLives() {
-        for (let i = 0; i<this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
-    }
-
-    private drawYourScore() {
-        this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
-    }
-
-    private drawRandomAsteroids(min: number, max: number) {
-        for (let i = this.randomNumber(min, max); i>0; i--) {
-            this.drawRandomAsteroid();
-        }
-    }
-
     private drawRandomAsteroid() {
         let x = this.randomNumber(0, this.canvas.width),
             y = this.randomNumber(0, this.canvas.height),
@@ -216,14 +186,6 @@ class Game {
         let asteroidType: AsteroidImage = imageCount[this.randomNumber(0, imageCount.length-1)];
         let subImage: number = asteroidType.images[this.randomNumber(0, asteroidType.images.length-1)];
         this.addImage(`./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`, x, y);
-    }
-
-    private drawPlayerShip() {
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
-    }
-
-    private drawFinalScore() {
-        this.centerText(`You died with ${this.score} points`, 100, 96);
     }
 
     private drawHighScores() {
