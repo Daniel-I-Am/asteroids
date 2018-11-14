@@ -44,9 +44,9 @@ class Game {
         ]
 
         // all screens: uncomment to activate 
-        this.start_screen();
+        // this.start_screen();
         // this.level_screen();
-        // this.title_screen();
+        this.title_screen();
 
     }
 
@@ -139,7 +139,8 @@ class Game {
      * @param src src location of the desired image
      * @param x X-location to put the center of the image
      * @param y Y-location to put the center of the image
-     * @param callback callback function, executed once images has been loaded in and drawn on the screen
+     * @param {Function} [callback=null] callback function, executed once images has been loaded in and drawn on the screen
+     * @param {boolean} [shouldCenter=true] Whether the image should be put relative to it's center 
      */
     private addImage(src: string, x: number, y: number, callback: Function = null, shouldCenter: boolean = true) {
         let image: HTMLImageElement = new Image;
@@ -178,22 +179,11 @@ class Game {
 
     private drawPlayerLives() {
         for (let i = 0; i<this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 64, 30, null, false);
-        // let image: HTMLImageElement = new Image;
-        // image.addEventListener('load', () => {
-        //     for (let i = 0; i<this.lives; i++) {
-        //         this.ctx.drawImage(image, i*image.width + 50, 30);
-        //     }
-        // });
-        // image.src = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
     }
 
     private drawYourScore() {
-        let text = "Score: " + this.score.toString();
-        this.ctx.font = "32px Minecraft";
-        this.ctx.fillStyle = "#ffffff";
-        this.ctx.textAlign = "right";
-        this.ctx.fillText(text, this.canvas.width - 50, 50);
+        this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
     }
 
     private drawRandomAsteroids(min: number, max: number) {
@@ -217,20 +207,13 @@ class Game {
             {name: "Grey_tiny", images: [1,2]}
         ];
 
-        image.addEventListener('load', () => {
-            this.ctx.drawImage(image, x, y);
-        });
         let asteroidType: AsteroidImage = imageCount[this.randomNumber(0, imageCount.length-1)];
         let subImage: number = asteroidType.images[this.randomNumber(0, asteroidType.images.length-1)];
-        image.src = `./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`;
+        this.addImage(`./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`, x, y);
     }
 
     private drawPlayerShip() {
-        let image = new Image;
-        image.addEventListener('load', () => {
-            this.ctx.drawImage(image, (this.canvas.width - image.width)/2, this.canvas.height - 200);
-        });
-        image.src = "./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png";
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
     }
 
     private drawFinalScore() {
@@ -238,17 +221,17 @@ class Game {
     }
 
     private drawHighScores() {
+        this.centerText("Highscores", 250, 64)
         for (let i = 0; i < this.highscores.length; i++) {
             const elem = this.highscores[i];
-            this.centerText(`${elem.playerName} - ${elem.score} points`, 250 + i * 50, 48);
+            this.centerText(`${elem.playerName} - ${elem.score} points`, 300 + i * 50, 48);
         }
     }
 }
 
 //this will get an HTML element. I cast this element in de appropriate type using <>
-let Asteroids;
 let init = function () {
-    Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
+    const Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
 };
 //add loadlistener for custom font types
 window.addEventListener('load', init);

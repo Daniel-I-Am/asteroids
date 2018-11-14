@@ -3,7 +3,13 @@
     src: url('../fonts/Minecraft.ttf') format('truetype');
 }
 
-canvas{
+canvas {
     font-family: 'Minecraft';
     background-image: url("../images/nebula-bg.jpg");
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }

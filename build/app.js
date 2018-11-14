@@ -21,7 +21,7 @@ class Game {
                 score: 200
             }
         ];
-        this.start_screen();
+        this.title_screen();
     }
     start_screen() {
         let buttonOffset = 100;
@@ -85,14 +85,10 @@ class Game {
     }
     drawPlayerLives() {
         for (let i = 0; i < this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 64, 30, null, false);
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
     }
     drawYourScore() {
-        let text = "Score: " + this.score.toString();
-        this.ctx.font = "32px Minecraft";
-        this.ctx.fillStyle = "#ffffff";
-        this.ctx.textAlign = "right";
-        this.ctx.fillText(text, this.canvas.width - 50, 50);
+        this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
     }
     drawRandomAsteroids(min, max) {
         for (let i = this.randomNumber(min, max); i > 0; i--) {
@@ -111,33 +107,26 @@ class Game {
             { name: "Grey_small", images: [1, 2] },
             { name: "Grey_tiny", images: [1, 2] }
         ];
-        image.addEventListener('load', () => {
-            this.ctx.drawImage(image, x, y);
-        });
         let asteroidType = imageCount[this.randomNumber(0, imageCount.length - 1)];
         let subImage = asteroidType.images[this.randomNumber(0, asteroidType.images.length - 1)];
-        image.src = `./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`;
+        this.addImage(`./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`, x, y);
     }
     drawPlayerShip() {
-        let image = new Image;
-        image.addEventListener('load', () => {
-            this.ctx.drawImage(image, (this.canvas.width - image.width) / 2, this.canvas.height - 200);
-        });
-        image.src = "./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png";
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
     }
     drawFinalScore() {
         this.centerText(`You died with ${this.score} points`, 100, 96);
     }
     drawHighScores() {
+        this.centerText("Highscores", 250, 64);
         for (let i = 0; i < this.highscores.length; i++) {
             const elem = this.highscores[i];
-            this.centerText(`${elem.playerName} - ${elem.score} points`, 250 + i * 50, 48);
+            this.centerText(`${elem.playerName} - ${elem.score} points`, 300 + i * 50, 48);
         }
     }
 }
-let Asteroids;
 let init = function () {
-    Asteroids = new Game(document.getElementById('canvas'));
+    const Asteroids = new Game(document.getElementById('canvas'));
 };
 window.addEventListener('load', init);
 //# sourceMappingURL=app.js.map
