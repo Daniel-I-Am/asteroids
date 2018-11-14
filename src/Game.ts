@@ -141,10 +141,14 @@ class Game {
      * @param y Y-location to put the center of the image
      * @param callback callback function, executed once images has been loaded in and drawn on the screen
      */
-    private addImage(src: string, x: number, y: number, callback: Function = null) {
+    private addImage(src: string, x: number, y: number, callback: Function = null, shouldCenter: boolean = true) {
         let image: HTMLImageElement = new Image;
         image.addEventListener('load', () => {
-            this.ctx.drawImage(image, x-image.width/2, y-image.height/2);
+            if (shouldCenter) {
+                this.ctx.drawImage(image, x-image.width/2, y-image.height/2);
+            } else {
+                this.ctx.drawImage(image, x, y);
+            }
             if (callback)
                 callback();
         });
@@ -173,13 +177,15 @@ class Game {
     }
 
     private drawPlayerLives() {
-        let image: HTMLImageElement = new Image;
-        image.addEventListener('load', () => {
-            for (let i = 0; i<this.lives; i++) {
-                this.ctx.drawImage(image, i*image.width + 50, 30);
-            }
-        });
-        image.src = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
+        for (let i = 0; i<this.lives; i++)
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 64, 30, null, false);
+        // let image: HTMLImageElement = new Image;
+        // image.addEventListener('load', () => {
+        //     for (let i = 0; i<this.lives; i++) {
+        //         this.ctx.drawImage(image, i*image.width + 50, 30);
+        //     }
+        // });
+        // image.src = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
     }
 
     private drawYourScore() {
