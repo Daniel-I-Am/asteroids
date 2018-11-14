@@ -44,9 +44,9 @@ class Game {
         ]
 
         // all screens: uncomment to activate 
-        // this.start_screen();
+        this.start_screen();
         // this.level_screen();
-        this.title_screen();
+        // this.title_screen();
 
     }
 
@@ -145,7 +145,7 @@ class Game {
     }
 
     /**
-     * 
+     * Adds an image to the screen at the specified location
      * @param {string} src src location of the desired image
      * @param {number} x X-location to put the center of the image
      * @param {number} y Y-location to put the center of the image

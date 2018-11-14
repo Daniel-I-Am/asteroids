@@ -21,7 +21,7 @@ class Game {
                 score: 200
             }
         ];
-        this.title_screen();
+        this.start_screen();
     }
     start_screen() {
         let buttonOffset = 100;
