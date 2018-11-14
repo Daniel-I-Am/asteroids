@@ -38,12 +38,13 @@ class Game {
         for (let i = 0; i < this.lives; i++)
             this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
-        this.drawRandomAsteroids(10, 20);
-        this.drawPlayerShip();
+        for (let i = this.randomNumber(10, 20); i > 0; i--)
+            this.drawRandomAsteroid();
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
     }
     title_screen() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawFinalScore();
+        this.centerText(`You died with ${this.score} points`, 100, 96);
         this.drawHighScores();
     }
     randomNumber(min, max) {
@@ -72,15 +73,6 @@ class Game {
         });
         image.src = src;
     }
-    drawPlayerLives() {
-    }
-    drawYourScore() {
-    }
-    drawRandomAsteroids(min, max) {
-        for (let i = this.randomNumber(min, max); i > 0; i--) {
-            this.drawRandomAsteroid();
-        }
-    }
     drawRandomAsteroid() {
         let x = this.randomNumber(0, this.canvas.width), y = this.randomNumber(0, this.canvas.height), image = new Image;
         let imageCount = [
@@ -96,12 +88,6 @@ class Game {
         let asteroidType = imageCount[this.randomNumber(0, imageCount.length - 1)];
         let subImage = asteroidType.images[this.randomNumber(0, asteroidType.images.length - 1)];
         this.addImage(`./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`, x, y);
-    }
-    drawPlayerShip() {
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
-    }
-    drawFinalScore() {
-        this.centerText(`You died with ${this.score} points`, 100, 96);
     }
     drawHighScores() {
         this.centerText("Highscores", 250, 64);

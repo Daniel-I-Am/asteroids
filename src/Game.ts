@@ -83,7 +83,7 @@ class Game {
         //2. draw current score
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         //3. draw random asteroids
-        for (let i = this.randomNumber(min, max); i>0; i--)
+        for (let i = this.randomNumber(10, 20); i>0; i--)
             this.drawRandomAsteroid();
         //4. draw player spaceship
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
