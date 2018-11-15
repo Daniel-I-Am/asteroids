@@ -21,6 +21,7 @@ class Game {
                 score: 200
             }
         ];
+        this.start_screen();
     }
     start_screen() {
         let buttonOffset = 100;
@@ -29,21 +30,21 @@ class Game {
         this.centerText("Press start to play", 400, 48);
         this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width / 2, this.canvas.height - buttonOffset, "click", () => {
             this.level_screen();
-            console.log("adding listeners");
             window.addEventListener("keydown", (e) => this.keyDownHandler(e));
             window.addEventListener("keyup", (e) => this.keyUpHandler(e));
             window.setInterval(() => this.draw(), 1000 / 30);
         }, 24, true);
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, this.canvas.height / 2);
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, 500);
     }
     level_screen() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         for (let i = this.randomNumber(10, 20); i > 0; i--)
             this.drawRandomAsteroid();
         this.spaceShipLoc = { x: this.canvas.width / 2, y: this.canvas.height - 200 };
+        this.spaceShipRot = 0;
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
     }
     title_screen() {
@@ -63,19 +64,21 @@ class Game {
     centerText(text, y, fontSize, fontFamily = "Minecraft", color = "#ffffff") {
         this.writeText(text, this.canvas.width / 2, y, fontSize, "center", fontFamily, color);
     }
-    addImage(src, x, y, callback = null, shouldCenter = true) {
+    addImage(src, x, y, rot = 0, callback = null, shouldCenter = true) {
         let image = new Image;
         image.addEventListener('load', () => {
-            if (shouldCenter) {
-                this.ctx.drawImage(image, x - image.width / 2, y - image.height / 2);
-            }
-            else {
-                this.ctx.drawImage(image, x, y);
-            }
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.rotate(rot * Math.PI / 180);
+            if (shouldCenter)
+                this.ctx.translate(-image.width / 2, -image.height / 2);
+            this.ctx.drawImage(image, 0, 0);
+            this.ctx.restore();
             if (callback)
                 callback(this);
         });
         image.src = src;
+        return image.width, image.height;
     }
     addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
         let image = new Image;
@@ -145,6 +148,12 @@ class Game {
             case 83:
                 this.downPressed = true;
                 break;
+            case 81:
+                this.rotRPressed = true;
+                break;
+            case 69:
+                this.rotLPressed = true;
+                break;
         }
     }
     keyUpHandler(event) {
@@ -165,26 +174,52 @@ class Game {
             case 83:
                 this.downPressed = false;
                 break;
+            case 81:
+                this.rotRPressed = false;
+                break;
+            case 69:
+                this.rotLPressed = false;
+                break;
         }
     }
     draw() {
-        this.ctx.clearRect(this.spaceShipLoc.x - 64, this.spaceShipLoc.y - 64, 128, 128);
+        let shipWidth = 104, shipHeight = 80, movementSpeed = 2, rotationSpeed = 2, oldLoc = this.spaceShipLoc;
+        let x = movementSpeed * Math.sin(this.spaceShipRot * Math.PI / 180), y = movementSpeed * Math.cos(this.spaceShipRot * Math.PI / 180);
         if (this.leftPressed)
-            this.spaceShipLoc.x -= 2;
+            this.spaceShipLoc = { x: this.spaceShipLoc.x - y, y: this.spaceShipLoc.y - x };
         if (this.rightPressed)
-            this.spaceShipLoc.x += 2;
+            this.spaceShipLoc = { x: this.spaceShipLoc.x + y, y: this.spaceShipLoc.y + x };
         if (this.upPressed)
-            this.spaceShipLoc.y -= 2;
+            this.spaceShipLoc = { x: this.spaceShipLoc.x + x, y: this.spaceShipLoc.y - y };
         if (this.downPressed)
-            this.spaceShipLoc.y += 2;
-        this.spaceShipLoc.x = Math.min(this.canvas.width, Math.max(0, this.spaceShipLoc.x));
-        this.spaceShipLoc.x = Math.min(this.canvas.height, Math.max(0, this.spaceShipLoc.y));
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, null, true);
+            this.spaceShipLoc = { x: this.spaceShipLoc.x - x, y: this.spaceShipLoc.y + y };
+        if (this.rotLPressed)
+            this.spaceShipRot += rotationSpeed;
+        if (this.rotRPressed)
+            this.spaceShipRot -= rotationSpeed;
+        if (this.spaceShipLoc.x - shipWidth / 2 < 0)
+            this.spaceShipLoc.x = 0 + shipWidth / 2;
+        if (this.spaceShipLoc.x + shipWidth / 2 > this.canvas.width)
+            this.spaceShipLoc.x = this.canvas.width - shipWidth / 2;
+        if (this.spaceShipLoc.y - shipHeight / 2 < 0)
+            this.spaceShipLoc.y = 0 + shipHeight / 2;
+        if (this.spaceShipLoc.y + shipHeight / 2 > this.canvas.height)
+            this.spaceShipLoc.y = this.canvas.height - shipHeight / 2;
+        if (this.spaceShipRot < -180)
+            this.spaceShipRot = 360 + this.spaceShipRot;
+        if (this.spaceShipRot > 180)
+            this.spaceShipRot = this.spaceShipRot - 360;
+        this.ctx.save();
+        this.ctx.translate(oldLoc.x, oldLoc.y);
+        this.ctx.rotate(this.spaceShipRot * Math.PI / 180);
+        this.ctx.clearRect(-shipWidth / 2, -shipHeight / 2, shipWidth, shipHeight);
+        this.ctx.restore();
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
     }
 }
+let Asteroids;
 let init = function () {
-    const Asteroids = new Game(document.getElementById('canvas'));
-    Asteroids.start_screen();
+    Asteroids = new Game(document.getElementById('canvas'));
 };
 window.addEventListener('load', init);
 //# sourceMappingURL=app.js.map

@@ -29,7 +29,10 @@ class Game {
     private rightPressed: boolean;
     private upPressed: boolean;
     private downPressed: boolean;
+    private rotLPressed: boolean;
+    private rotRPressed: boolean;
     private spaceShipLoc: Loc;
+    private spaceShipRot: number;
 
     public constructor(canvasId: HTMLCanvasElement) {
         //construct all canvas
@@ -55,7 +58,7 @@ class Game {
         ]
 
         // all screens: uncomment to activate 
-        // this.start_screen();
+        this.start_screen();
         // this.level_screen();
         // this.title_screen();
 
@@ -74,18 +77,14 @@ class Game {
         //2. add 'Press to play' text
         this.centerText("Press start to play", 400, 48);
         //3. add button with 'start' text
-        // this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width/2, this.canvas.height - buttonOffset, () => {
-        //     this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
-        // });
         this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width/2, this.canvas.height - buttonOffset, "click", () => {
             this.level_screen()
-            console.log("adding listeners")
             window.addEventListener("keydown", (e) => this.keyDownHandler(e));
             window.addEventListener("keyup",   (e) => this.keyUpHandler(e));
             window.setInterval(() => this.draw(), 1000/30);
         }, 24, true);
         //4. add Asteroid image
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, this.canvas.height/2);
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, 500);
     }
 
     //-------- level screen methods -------------------------------------
@@ -97,7 +96,7 @@ class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. load life images
         for (let i = 0; i<this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
+            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
         //2. draw current score
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         //3. draw random asteroids
@@ -105,6 +104,7 @@ class Game {
             this.drawRandomAsteroid();
         //4. draw player spaceship
         this.spaceShipLoc = {x: this.canvas.width/2, y: this.canvas.height - 200}
+        this.spaceShipRot = 0;
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
     }
 
@@ -185,26 +185,32 @@ class Game {
      * @param {string} src src location of the desired image
      * @param {number} x X-location to put the center of the image
      * @param {number} y Y-location to put the center of the image
+     * @param {number} rot Rotation to use in degrees
      * @param {Function} callback callback function, executed once images has been loaded in and drawn on the screen
      * @param {boolean} shouldCenter Whether the image should be put relative to it's center 
+     * @returns {number, number} Size of image
      */
     private addImage(src: string,
         x: number,
         y: number,
+        rot: number = 0,
         callback: Function = null,
         shouldCenter: boolean = true
     ) {
         let image: HTMLImageElement = new Image;
         image.addEventListener('load', () => {
-            if (shouldCenter) {
-                this.ctx.drawImage(image, x-image.width/2, y-image.height/2);
-            } else {
-                this.ctx.drawImage(image, x, y);
-            }
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.rotate(rot*Math.PI/180);
+            if (shouldCenter)
+                this.ctx.translate(-image.width/2, -image.height/2);
+            this.ctx.drawImage(image, 0, 0);
+            this.ctx.restore();
             if (callback)
                 callback(this);
         });
         image.src = src;
+        return image.width, image.height
     }
 
     private addButton(
@@ -293,6 +299,12 @@ class Game {
             case 83:
                 this.downPressed = true;
                 break;
+            case 81:
+                this.rotRPressed = true;
+                break;
+            case 69:
+                this.rotLPressed = true;
+                break;
         }
     }
 
@@ -314,25 +326,51 @@ class Game {
             case 83:
                 this.downPressed = false;
                 break;
+            case 81:
+                this.rotRPressed = false;
+                break;
+            case 69:
+                this.rotLPressed = false;
+                break;
         }
     }
 
     private draw() {
-        this.ctx.clearRect(this.spaceShipLoc.x-64, this.spaceShipLoc.y-64, 128, 128);
-        if (this.leftPressed) this.spaceShipLoc.x-=2;
-        if (this.rightPressed) this.spaceShipLoc.x+=2;
-        if (this.upPressed) this.spaceShipLoc.y-=2;
-        if (this.downPressed) this.spaceShipLoc.y+=2;
-        this.spaceShipLoc.x = Math.min(this.canvas.width, Math.max(0, this.spaceShipLoc.x));
-        this.spaceShipLoc.x = Math.min(this.canvas.height, Math.max(0, this.spaceShipLoc.y));
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, null, true);
+        let shipWidth = 104,
+            shipHeight = 80,
+            movementSpeed = 2,
+            rotationSpeed = 2,
+            oldLoc = this.spaceShipLoc;
+        let x = movementSpeed*Math.sin(this.spaceShipRot*Math.PI/180),
+            y = movementSpeed*Math.cos(this.spaceShipRot*Math.PI/180);
+        if (this.leftPressed) this.spaceShipLoc = {x: this.spaceShipLoc.x - y, y: this.spaceShipLoc.y - x};
+        if (this.rightPressed) this.spaceShipLoc = {x: this.spaceShipLoc.x + y, y: this.spaceShipLoc.y + x};
+        if (this.upPressed) this.spaceShipLoc = {x: this.spaceShipLoc.x + x, y: this.spaceShipLoc.y - y};
+        if (this.downPressed) this.spaceShipLoc = {x: this.spaceShipLoc.x - x, y: this.spaceShipLoc.y + y};
+        if (this.rotLPressed) this.spaceShipRot+=rotationSpeed;
+        if (this.rotRPressed) this.spaceShipRot-=rotationSpeed;
+
+        if (this.spaceShipLoc.x - shipWidth/2  < 0)                  this.spaceShipLoc.x = 0 + shipWidth/2;
+        if (this.spaceShipLoc.x + shipWidth/2  > this.canvas.width ) this.spaceShipLoc.x = this.canvas.width - shipWidth/2;
+        if (this.spaceShipLoc.y - shipHeight/2 < 0)                  this.spaceShipLoc.y = 0 + shipHeight/2;
+        if (this.spaceShipLoc.y + shipHeight/2 > this.canvas.height) this.spaceShipLoc.y = this.canvas.height - shipHeight/2;
+        if (this.spaceShipRot < -180) this.spaceShipRot = 360 + this.spaceShipRot;
+        if (this.spaceShipRot > 180) this.spaceShipRot = this.spaceShipRot - 360;
+
+        this.ctx.save();
+        this.ctx.translate(oldLoc.x, oldLoc.y);
+        this.ctx.rotate(this.spaceShipRot*Math.PI/180);
+        this.ctx.clearRect(-shipWidth/2, -shipHeight/2, shipWidth, shipHeight);
+        this.ctx.restore();
+
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
     }
 }
 
 //this will get an HTML element. I cast this element in de appropriate type using <>
+let Asteroids: Game;
 let init = function () {
-    const Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
-    Asteroids.start_screen();
+    Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
 };
 //add loadlistener for custom font types
 window.addEventListener('load', init);
