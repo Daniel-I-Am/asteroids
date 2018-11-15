@@ -122,12 +122,20 @@ class Game {
      * @param {number} y Y-Coord to write at
      * @param {number} fontSize fontsize to use
      * @param {CanvasTextAlign} align Alignment to use when writing
-     * @param {string} fontFace fontface to use
+     * @param {string} fontFamily fontFamily to use
      * @param {string} color Color to use, default white
      */
-    private writeText(text: string, x: number, y: number, fontSize: number, align: CanvasTextAlign = "left", fontFace: string = "Minecraft", color: string = "#ffffff") {
+    private writeText(
+        text: string,
+        x: number,
+        y: number,
+        fontSize: number,
+        align: CanvasTextAlign = "left",
+        fontFamily: string = "Minecraft",
+        color: string = "#ffffff"
+    ) {
         this.ctx.fillStyle = color;
-        this.ctx.font = `${fontSize}px ${fontFace}`;
+        this.ctx.font = `${fontSize}px ${fontFamily}`;
         this.ctx.textAlign = align;
         this.ctx.fillText(text, x, y);
     }
@@ -137,11 +145,20 @@ class Game {
      * @param {string} text Text to write to canvas
      * @param {number} y Y-Coord to center text
      * @param {number} fontSize fontsize to use
-     * @param {string} fontFace fontface to use
+     * @param {string} fontFamily fontFamily to use
      * @param {string} color Color to use, default white
      */
-    private centerText(text: string, y: number, fontSize: number, fontFace: string = "Minecraft", color: string = "#ffffff") {
-        this.writeText(text, this.canvas.width/2, y, fontSize, "center", fontFace, color);
+    private centerText(text: string,
+        y: number,
+        fontSize: number,
+        fontFamily: string = "Minecraft",
+        color: string = "#ffffff"
+    ) {
+        this.writeText(
+            text, this.canvas.width/2,
+            y, fontSize, "center",
+            fontFamily, color
+        );
     }
 
     /**
@@ -152,7 +169,12 @@ class Game {
      * @param {Function} callback callback function, executed once images has been loaded in and drawn on the screen
      * @param {boolean} shouldCenter Whether the image should be put relative to it's center 
      */
-    private addImage(src: string, x: number, y: number, callback: Function = null, shouldCenter: boolean = true) {
+    private addImage(src: string,
+        x: number,
+        y: number,
+        callback: Function = null,
+        shouldCenter: boolean = true
+    ) {
         let image: HTMLImageElement = new Image;
         image.addEventListener('load', () => {
             if (shouldCenter) {
