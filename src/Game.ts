@@ -8,6 +8,11 @@ interface AsteroidImage {
     images: number[];
 }
 
+interface Loc {
+    x: number;
+    y: number;
+}
+
 class Game {
     //global attr for canvas
     //readonly attributes must be initialized in the constructor
@@ -44,7 +49,7 @@ class Game {
         ]
 
         // all screens: uncomment to activate 
-        this.start_screen();
+        // this.start_screen();
         // this.level_screen();
         // this.title_screen();
 
@@ -63,9 +68,10 @@ class Game {
         //2. add 'Press to play' text
         this.centerText("Press start to play", 400, 48);
         //3. add button with 'start' text
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width/2, this.canvas.height - buttonOffset, () => {
-            this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
-        });
+        // this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width/2, this.canvas.height - buttonOffset, () => {
+        //     this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
+        // });
+        this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width/2, this.canvas.height - buttonOffset, "click", () => this.level_screen(), 24, true);
         //4. add Asteroid image
         this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, this.canvas.height/2);
     }
@@ -75,6 +81,7 @@ class Game {
      * Function to initialize the level screen
      */
     public level_screen() {
+        console.log(4, this)
         //0. clear screen
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. load life images
@@ -183,7 +190,48 @@ class Game {
                 this.ctx.drawImage(image, x, y);
             }
             if (callback)
-                callback();
+                callback(this);
+        });
+        image.src = src;
+    }
+
+    private addButton(
+        src: string,
+        text: string,
+        x: number,
+        y: number,
+        eventType: string,
+        callback: Function,
+        fontSize: number,
+        shouldCenter: boolean = true
+    ) {
+        let image = new Image;
+        image.addEventListener('load', () => {
+            console.log(1, this)
+            let tl: Loc, br: Loc;
+            if (shouldCenter) {
+                this.ctx.drawImage(image, x-image.width/2, y-image.height/2);
+                this.writeText(text, x, y + fontSize/3, fontSize, "center", "Minecraft", "black");
+                tl = {x: x-image.width/2, y: y-image.height/2};
+                br = {x: x+image.width/2, y: y+image.height/2};
+            } else {
+                this.ctx.drawImage(image, x, y);
+                tl = {x: x, y: y};
+                br = {x: x+image.width, y: y+image.width};
+                this.writeText(text, x+image.width/2, y+image.height/2, fontSize, "center", "Minecraft", "black");
+            }
+            if (!callback)
+                return;
+            this.canvas.addEventListener(eventType, (event: MouseEvent) => {
+                console.log(2, this)
+                if (
+                    event.x > tl.x && event.x < br.x &&
+                    event.y > tl.y && event.y < br.y
+                ) {
+                    console.log(3, this);
+                    callback();
+                }
+            });
         });
         image.src = src;
     }
@@ -222,6 +270,7 @@ class Game {
 //this will get an HTML element. I cast this element in de appropriate type using <>
 let init = function () {
     const Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
+    Asteroids.start_screen();
 };
 //add loadlistener for custom font types
 window.addEventListener('load', init);

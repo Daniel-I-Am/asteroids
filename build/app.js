@@ -21,19 +21,17 @@ class Game {
                 score: 200
             }
         ];
-        this.start_screen();
     }
     start_screen() {
         let buttonOffset = 100;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.centerText("Asteroids", 200, 192);
         this.centerText("Press start to play", 400, 48);
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width / 2, this.canvas.height - buttonOffset, () => {
-            this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
-        });
+        this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width / 2, this.canvas.height - buttonOffset, "click", () => this.level_screen(), 24, true);
         this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, this.canvas.height / 2);
     }
     level_screen() {
+        console.log(4, this);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.lives; i++)
             this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
@@ -50,14 +48,14 @@ class Game {
     randomNumber(min, max) {
         return Math.round(Math.random() * (max - min) + min);
     }
-    writeText(text, x, y, fontSize, align = "left", fontFace = "Minecraft", color = "#ffffff") {
+    writeText(text, x, y, fontSize, align = "left", fontFamily = "Minecraft", color = "#ffffff") {
         this.ctx.fillStyle = color;
-        this.ctx.font = `${fontSize}px ${fontFace}`;
+        this.ctx.font = `${fontSize}px ${fontFamily}`;
         this.ctx.textAlign = align;
         this.ctx.fillText(text, x, y);
     }
-    centerText(text, y, fontSize, fontFace = "Minecraft", color = "#ffffff") {
-        this.writeText(text, this.canvas.width / 2, y, fontSize, "center", fontFace, color);
+    centerText(text, y, fontSize, fontFamily = "Minecraft", color = "#ffffff") {
+        this.writeText(text, this.canvas.width / 2, y, fontSize, "center", fontFamily, color);
     }
     addImage(src, x, y, callback = null, shouldCenter = true) {
         let image = new Image;
@@ -69,7 +67,37 @@ class Game {
                 this.ctx.drawImage(image, x, y);
             }
             if (callback)
-                callback();
+                callback(this);
+        });
+        image.src = src;
+    }
+    addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
+        let image = new Image;
+        image.addEventListener('load', () => {
+            console.log(1, this);
+            let tl, br;
+            if (shouldCenter) {
+                this.ctx.drawImage(image, x - image.width / 2, y - image.height / 2);
+                this.writeText(text, x, y + fontSize / 3, fontSize, "center", "Minecraft", "black");
+                tl = { x: x - image.width / 2, y: y - image.height / 2 };
+                br = { x: x + image.width / 2, y: y + image.height / 2 };
+            }
+            else {
+                this.ctx.drawImage(image, x, y);
+                tl = { x: x, y: y };
+                br = { x: x + image.width, y: y + image.width };
+                this.writeText(text, x + image.width / 2, y + image.height / 2, fontSize, "center", "Minecraft", "black");
+            }
+            if (!callback)
+                return;
+            this.canvas.addEventListener(eventType, (event) => {
+                console.log(2, this);
+                if (event.x > tl.x && event.x < br.x &&
+                    event.y > tl.y && event.y < br.y) {
+                    console.log(3, this);
+                    callback();
+                }
+            });
         });
         image.src = src;
     }
@@ -99,6 +127,7 @@ class Game {
 }
 let init = function () {
     const Asteroids = new Game(document.getElementById('canvas'));
+    Asteroids.start_screen();
 };
 window.addEventListener('load', init);
 //# sourceMappingURL=app.js.map
