@@ -41,8 +41,7 @@ class Game {
         for (let i = 0; i < this.lives; i++)
             this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
-        for (let i = this.randomNumber(10, 20); i > 0; i--)
-            this.drawRandomAsteroid();
+        this.drawRandomAsteroids();
         this.spaceShipLoc = { x: this.canvas.width / 2, y: this.canvas.height - 200 };
         this.spaceShipRot = 0;
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
@@ -73,12 +72,15 @@ class Game {
             if (shouldCenter)
                 this.ctx.translate(-image.width / 2, -image.height / 2);
             this.ctx.drawImage(image, 0, 0);
+            if (shouldCenter)
+                this.ctx.translate(image.width / 2, image.height / 2);
+            this.ctx.rotate(-rot * Math.PI / 180);
+            this.ctx.translate(-x, -y);
             this.ctx.restore();
             if (callback)
-                callback(this);
+                callback(image);
         });
         image.src = src;
-        return image.width, image.height;
     }
     addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
         let image = new Image;
@@ -107,8 +109,29 @@ class Game {
         });
         image.src = src;
     }
-    drawRandomAsteroid() {
-        let x = this.randomNumber(0, this.canvas.width), y = this.randomNumber(0, this.canvas.height), image = new Image;
+    drawRandomAsteroids() {
+        for (let i = 0; i < 5; i++) {
+            let callback = (imageDetails) => {
+                if (this.asteroidLocations == undefined) {
+                    this.asteroidLocations = [({ x: imageDetails.x, y: imageDetails.y })];
+                    this.asteroidSprite = [(imageDetails.src)];
+                    this.asteroidDirections = [(Math.random() * 360 - 180)];
+                    this.asteroidSpeed = [(Math.ceil(Math.random() * 5))];
+                    this.asteroidSizes = [([imageDetails.w, imageDetails.h])];
+                }
+                else {
+                    this.asteroidLocations.push({ x: imageDetails.x, y: imageDetails.y });
+                    this.asteroidSprite.push(imageDetails.src);
+                    this.asteroidDirections.push(Math.random() * 360 - 180);
+                    this.asteroidSpeed.push(Math.ceil(Math.random() * 5));
+                    this.asteroidSizes.push([imageDetails.w, imageDetails.h]);
+                }
+            };
+            this.drawRandomAsteroid(callback);
+        }
+    }
+    drawRandomAsteroid(callback) {
+        let x = this.randomNumber(0, this.canvas.width), y = this.randomNumber(0, this.canvas.height);
         let imageCount = [
             { name: "Brown_big", images: [1, 2, 3, 4] },
             { name: "Brown_med", images: [1, 3] },
@@ -121,7 +144,11 @@ class Game {
         ];
         let asteroidType = imageCount[this.randomNumber(0, imageCount.length - 1)];
         let subImage = asteroidType.images[this.randomNumber(0, asteroidType.images.length - 1)];
-        this.addImage(`./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`, x, y);
+        let spriteSrc = `./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`;
+        this.addImage(spriteSrc, x, y, 0, (image) => {
+            this.ctx.clearRect(x - image.width / 2, y - image.height / 2, image.width, image.height);
+            callback({ src: spriteSrc, x: x, y: y, w: image.width, h: image.height });
+        });
     }
     drawHighScores() {
         this.centerText("Highscores", 250, 64);
@@ -183,19 +210,15 @@ class Game {
         }
     }
     draw() {
-        let shipWidth = 104, shipHeight = 80, movementSpeed = 2, rotationSpeed = 2, oldLoc = this.spaceShipLoc;
+        let shipWidth = 104, shipHeight = 80, movementSpeed = 10, rotationSpeed = 5, oldLoc = this.spaceShipLoc;
         let x = movementSpeed * Math.sin(this.spaceShipRot * Math.PI / 180), y = movementSpeed * Math.cos(this.spaceShipRot * Math.PI / 180);
-        if (this.leftPressed)
-            this.spaceShipLoc = { x: this.spaceShipLoc.x - y, y: this.spaceShipLoc.y - x };
-        if (this.rightPressed)
-            this.spaceShipLoc = { x: this.spaceShipLoc.x + y, y: this.spaceShipLoc.y + x };
         if (this.upPressed)
             this.spaceShipLoc = { x: this.spaceShipLoc.x + x, y: this.spaceShipLoc.y - y };
         if (this.downPressed)
             this.spaceShipLoc = { x: this.spaceShipLoc.x - x, y: this.spaceShipLoc.y + y };
-        if (this.rotLPressed)
+        if (this.rightPressed)
             this.spaceShipRot += rotationSpeed;
-        if (this.rotRPressed)
+        if (this.leftPressed)
             this.spaceShipRot -= rotationSpeed;
         if (this.spaceShipLoc.x - shipWidth / 2 < 0)
             this.spaceShipLoc.x = 0 + shipWidth / 2;
@@ -215,6 +238,39 @@ class Game {
         this.ctx.clearRect(-shipWidth / 2, -shipHeight / 2, shipWidth, shipHeight);
         this.ctx.restore();
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
+        if (!this.asteroidSprite)
+            return;
+        this.asteroidSprite.forEach((_, i) => {
+            this.ctx.translate(this.asteroidLocations[i].x, this.asteroidLocations[i].y);
+            this.ctx.rotate(this.asteroidDirections[i] * Math.PI / 180);
+            this.ctx.clearRect(-this.asteroidSizes[i][0] / 2 - this.asteroidSpeed[i], -this.asteroidSizes[i][1] / 2 - this.asteroidSpeed[i], this.asteroidSizes[i][0] + this.asteroidSpeed[i] * 2, this.asteroidSizes[i][1] + this.asteroidSpeed[i] * 2);
+            this.ctx.rotate(-this.asteroidDirections[i] * Math.PI / 180);
+            this.ctx.translate(-this.asteroidLocations[i].x, -this.asteroidLocations[i].y);
+            let x = this.asteroidSpeed[i] * Math.sin(this.asteroidDirections[i] * Math.PI / 180), y = this.asteroidSpeed[i] * Math.cos(this.asteroidDirections[i] * Math.PI / 180);
+            this.asteroidLocations[i] = { x: this.asteroidLocations[i].x + x, y: this.asteroidLocations[i].y - y };
+            let location = this.asteroidLocations[i], size = this.asteroidSizes[i];
+            if (location.x + size[0] / 2 < 0) {
+                location.x += this.canvas.width + size[0];
+                console.log("x", location.x);
+            }
+            ;
+            if (location.x - size[0] / 2 > this.canvas.width) {
+                location.x -= this.canvas.width + size[0];
+                console.log("x", location.x);
+            }
+            ;
+            if (location.y + size[1] / 2 < 0) {
+                location.y += this.canvas.height + size[1];
+                console.log("y", location.y);
+            }
+            ;
+            if (location.y - size[1] / 2 > this.canvas.height) {
+                location.y -= this.canvas.height + size[1];
+                console.log("y", location.y);
+            }
+            ;
+            this.addImage(this.asteroidSprite[i], this.asteroidLocations[i].x, this.asteroidLocations[i].y, this.asteroidDirections[i]);
+        });
     }
 }
 let Asteroids;
