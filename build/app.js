@@ -27,17 +27,23 @@ class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.centerText("Asteroids", 200, 192);
         this.centerText("Press start to play", 400, 48);
-        this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width / 2, this.canvas.height - buttonOffset, "click", () => this.level_screen(), 24, true);
+        this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width / 2, this.canvas.height - buttonOffset, "click", () => {
+            this.level_screen();
+            console.log("adding listeners");
+            window.addEventListener("keydown", (e) => this.keyDownHandler(e));
+            window.addEventListener("keyup", (e) => this.keyUpHandler(e));
+            window.setInterval(() => this.draw(), 1000 / 30);
+        }, 24, true);
         this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, this.canvas.height / 2);
     }
     level_screen() {
-        console.log(4, this);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.lives; i++)
             this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, null, false);
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         for (let i = this.randomNumber(10, 20); i > 0; i--)
             this.drawRandomAsteroid();
+        this.spaceShipLoc = { x: this.canvas.width / 2, y: this.canvas.height - 200 };
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
     }
     title_screen() {
@@ -74,7 +80,6 @@ class Game {
     addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
         let image = new Image;
         image.addEventListener('load', () => {
-            console.log(1, this);
             let tl, br;
             if (shouldCenter) {
                 this.ctx.drawImage(image, x - image.width / 2, y - image.height / 2);
@@ -91,10 +96,8 @@ class Game {
             if (!callback)
                 return;
             this.canvas.addEventListener(eventType, (event) => {
-                console.log(2, this);
                 if (event.x > tl.x && event.x < br.x &&
                     event.y > tl.y && event.y < br.y) {
-                    console.log(3, this);
                     callback();
                 }
             });
@@ -123,6 +126,60 @@ class Game {
             const elem = this.highscores[i];
             this.centerText(`${elem.playerName} - ${elem.score} points`, 300 + i * 50, 48);
         }
+    }
+    keyDownHandler(event) {
+        switch (event.keyCode) {
+            case 37:
+            case 65:
+                this.leftPressed = true;
+                break;
+            case 38:
+            case 87:
+                this.upPressed = true;
+                break;
+            case 39:
+            case 68:
+                this.rightPressed = true;
+                break;
+            case 40:
+            case 83:
+                this.downPressed = true;
+                break;
+        }
+    }
+    keyUpHandler(event) {
+        switch (event.keyCode) {
+            case 37:
+            case 65:
+                this.leftPressed = false;
+                break;
+            case 38:
+            case 87:
+                this.upPressed = false;
+                break;
+            case 39:
+            case 68:
+                this.rightPressed = false;
+                break;
+            case 40:
+            case 83:
+                this.downPressed = false;
+                break;
+        }
+    }
+    draw() {
+        this.ctx.clearRect(this.spaceShipLoc.x - 64, this.spaceShipLoc.y - 64, 128, 128);
+        if (this.leftPressed)
+            this.spaceShipLoc.x -= 2;
+        if (this.rightPressed)
+            this.spaceShipLoc.x += 2;
+        if (this.upPressed)
+            this.spaceShipLoc.y -= 2;
+        if (this.downPressed)
+            this.spaceShipLoc.y += 2;
+        this.spaceShipLoc.x = Math.min(this.canvas.width, Math.max(0, this.spaceShipLoc.x));
+        this.spaceShipLoc.x = Math.min(this.canvas.height, Math.max(0, this.spaceShipLoc.y));
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, null, true);
     }
 }
 let init = function () {

@@ -25,6 +25,12 @@ class Game {
     private lives: number = 3;
     private highscores: Array<Score>;
 
+    private leftPressed: boolean;
+    private rightPressed: boolean;
+    private upPressed: boolean;
+    private downPressed: boolean;
+    private spaceShipLoc: Loc;
+
     public constructor(canvasId: HTMLCanvasElement) {
         //construct all canvas
         this.canvas = canvasId;
@@ -71,7 +77,13 @@ class Game {
         // this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", this.canvas.width/2, this.canvas.height - buttonOffset, () => {
         //     this.centerText("Start!", this.canvas.height - buttonOffset + 8, 24, "Minecraft", "#000000");
         // });
-        this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width/2, this.canvas.height - buttonOffset, "click", () => this.level_screen(), 24, true);
+        this.addButton("./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", "Start!", this.canvas.width/2, this.canvas.height - buttonOffset, "click", () => {
+            this.level_screen()
+            console.log("adding listeners")
+            window.addEventListener("keydown", (e) => this.keyDownHandler(e));
+            window.addEventListener("keyup",   (e) => this.keyUpHandler(e));
+            window.setInterval(() => this.draw(), 1000/30);
+        }, 24, true);
         //4. add Asteroid image
         this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, this.canvas.height/2);
     }
@@ -81,7 +93,6 @@ class Game {
      * Function to initialize the level screen
      */
     public level_screen() {
-        console.log(4, this)
         //0. clear screen
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. load life images
@@ -93,6 +104,7 @@ class Game {
         for (let i = this.randomNumber(10, 20); i>0; i--)
             this.drawRandomAsteroid();
         //4. draw player spaceship
+        this.spaceShipLoc = {x: this.canvas.width/2, y: this.canvas.height - 200}
         this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
     }
 
@@ -207,7 +219,6 @@ class Game {
     ) {
         let image = new Image;
         image.addEventListener('load', () => {
-            console.log(1, this)
             let tl: Loc, br: Loc;
             if (shouldCenter) {
                 this.ctx.drawImage(image, x-image.width/2, y-image.height/2);
@@ -223,12 +234,10 @@ class Game {
             if (!callback)
                 return;
             this.canvas.addEventListener(eventType, (event: MouseEvent) => {
-                console.log(2, this)
                 if (
                     event.x > tl.x && event.x < br.x &&
                     event.y > tl.y && event.y < br.y
                 ) {
-                    console.log(3, this);
                     callback();
                 }
             });
@@ -264,6 +273,59 @@ class Game {
             const elem = this.highscores[i];
             this.centerText(`${elem.playerName} - ${elem.score} points`, 300 + i * 50, 48);
         }
+    }
+
+    private keyDownHandler(event: KeyboardEvent) {
+        switch(event.keyCode) {
+            case 37:
+            case 65:
+                this.leftPressed = true
+                break;
+            case 38:
+            case 87:
+                this.upPressed = true;
+                break;
+            case 39:
+            case 68:
+                this.rightPressed = true;
+                break;
+            case 40:
+            case 83:
+                this.downPressed = true;
+                break;
+        }
+    }
+
+    private keyUpHandler(event: KeyboardEvent) {
+        switch(event.keyCode) {
+            case 37:
+            case 65:
+                this.leftPressed = false
+                break;
+            case 38:
+            case 87:
+                this.upPressed = false;
+                break;
+            case 39:
+            case 68:
+                this.rightPressed = false;
+                break;
+            case 40:
+            case 83:
+                this.downPressed = false;
+                break;
+        }
+    }
+
+    private draw() {
+        this.ctx.clearRect(this.spaceShipLoc.x-64, this.spaceShipLoc.y-64, 128, 128);
+        if (this.leftPressed) this.spaceShipLoc.x-=2;
+        if (this.rightPressed) this.spaceShipLoc.x+=2;
+        if (this.upPressed) this.spaceShipLoc.y-=2;
+        if (this.downPressed) this.spaceShipLoc.y+=2;
+        this.spaceShipLoc.x = Math.min(this.canvas.width, Math.max(0, this.spaceShipLoc.x));
+        this.spaceShipLoc.x = Math.min(this.canvas.height, Math.max(0, this.spaceShipLoc.y));
+        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, null, true);
     }
 }
 
