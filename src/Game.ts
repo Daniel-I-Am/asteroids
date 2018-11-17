@@ -231,7 +231,6 @@ class Game {
      * @param {number} x X-location to put the center of the image
      * @param {number} y Y-location to put the center of the image
      * @param {number} rot Rotation to use in degrees
-     * @param {Function} callback callback function, executed once images has been loaded in and drawn on the screen
      * @param {boolean} shouldCenter Whether the image should be put relative to it's center 
      * @returns {number, number} Size of image
      */
@@ -241,11 +240,11 @@ class Game {
         rot: number = 0,
         callback: Function = null,
         shouldCenter: boolean = true
-    ) {
+    ): SpriteSheetTexture {
         let image = this.spriteMapData.filter(obj => {
             return obj.name === src
         })[0];
-        if (!image) return;
+        if (!image) return null;
         this.ctx.translate(x, y);
         this.ctx.rotate(rot*Math.PI/180);
         if (shouldCenter)
@@ -256,8 +255,7 @@ class Game {
         this.ctx.rotate(-rot*Math.PI/180);
         this.ctx.translate(-x, -y);
         this.ctx.restore();
-        if (callback)
-            callback(image);
+        return image;
     }
 
     /**
@@ -355,12 +353,11 @@ class Game {
         let subImage: number = asteroidType.images[this.randomNumber(0, asteroidType.images.length-1)];
         let spriteSrc = `meteor${asteroidType.name}${subImage}.png`;
         // draw image, all the madness is inside this.addImage
-        this.addImage(spriteSrc, x, y, 0, (image: HTMLImageElement) => {
-            // we just need to parameters of the drawing for the callback, so immidiately remove the asteroid, this.draw takes care of drawing
-            this.ctx.clearRect(x-image.width/2, y-image.height/2, image.width, image.height);
-            // finally... call the callback with the data we needed
-            callback({src: spriteSrc, x: x, y: y, w: image.width, h: image.height});
-        });
+        let image = this.addImage(spriteSrc, x, y, 0)
+        // we just need to parameters of the drawing for the callback, so immidiately remove the asteroid, this.draw takes care of drawing
+        this.ctx.clearRect(x-image.width/2, y-image.height/2, image.width, image.height);
+        // finally... call the callback with the data we needed
+        callback({src: spriteSrc, x: x, y: y, w: image.width, h: image.height});
     }
 
     private drawHighScores() {

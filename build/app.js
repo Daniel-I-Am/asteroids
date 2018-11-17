@@ -85,7 +85,7 @@ class Game {
             return obj.name === src;
         })[0];
         if (!image)
-            return;
+            return null;
         this.ctx.translate(x, y);
         this.ctx.rotate(rot * Math.PI / 180);
         if (shouldCenter)
@@ -96,8 +96,7 @@ class Game {
         this.ctx.rotate(-rot * Math.PI / 180);
         this.ctx.translate(-x, -y);
         this.ctx.restore();
-        if (callback)
-            callback(image);
+        return image;
     }
     addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
         let image = new Image;
@@ -162,10 +161,9 @@ class Game {
         let asteroidType = imageCount[this.randomNumber(0, imageCount.length - 1)];
         let subImage = asteroidType.images[this.randomNumber(0, asteroidType.images.length - 1)];
         let spriteSrc = `meteor${asteroidType.name}${subImage}.png`;
-        this.addImage(spriteSrc, x, y, 0, (image) => {
-            this.ctx.clearRect(x - image.width / 2, y - image.height / 2, image.width, image.height);
-            callback({ src: spriteSrc, x: x, y: y, w: image.width, h: image.height });
-        });
+        let image = this.addImage(spriteSrc, x, y, 0);
+        this.ctx.clearRect(x - image.width / 2, y - image.height / 2, image.width, image.height);
+        callback({ src: spriteSrc, x: x, y: y, w: image.width, h: image.height });
     }
     drawHighScores() {
         this.centerText("Highscores", 250, 64);
