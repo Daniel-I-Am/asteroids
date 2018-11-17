@@ -453,10 +453,10 @@ class Game {
             this.asteroidLocations[i] = {x: this.asteroidLocations[i].x + x, y: this.asteroidLocations[i].y - y};
             let location = this.asteroidLocations[i],
                 size = this.asteroidSizes[i];
-            if (location.x + size[0]/2 < 0)                 { location.x += this.canvas.width + size[0]; console.log("x", location.x)};
-            if (location.x - size[0]/2 > this.canvas.width) { location.x -= this.canvas.width + size[0]; console.log("x", location.x)};
-            if (location.y + size[1]/2 < 0)                 { location.y += this.canvas.height + size[1]; console.log("y", location.y)};
-            if (location.y - size[1]/2 > this.canvas.height){ location.y -= this.canvas.height + size[1]; console.log("y", location.y)};
+            if (location.x + size[0]/2 < 0)                  location.x += this.canvas.width + size[0];
+            if (location.x - size[0]/2 > this.canvas.width)  location.x -= this.canvas.width + size[0];
+            if (location.y + size[1]/2 < 0)                  location.y += this.canvas.height + size[1];
+            if (location.y - size[1]/2 > this.canvas.height) location.y -= this.canvas.height + size[1];
             // draw the new asteroids, the madness lies inside this.addImage again
             this.addImage(this.asteroidSprite[i], this.asteroidLocations[i].x, this.asteroidLocations[i].y, this.asteroidDirections[i]);
         });
