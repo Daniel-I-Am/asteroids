@@ -21,7 +21,24 @@ class Game {
                 score: 200
             }
         ];
-        this.start_screen();
+        this.spriteMapImage = new Image;
+        this.spriteMapImage.addEventListener('load', () => {
+            fetch('./assets/images/SpaceShooterRedux/Spritesheet/sheet.xml')
+                .then((response) => {
+                return response.text();
+            })
+                .then((str) => {
+                let parser = new DOMParser();
+                this.spriteMapData = [];
+                Array.prototype.forEach.call(parser.parseFromString(str, "text/xml").getElementsByTagName("SubTexture"), (e) => {
+                    let atts = e.attributes;
+                    this.spriteMapData.push({ name: atts[0].nodeValue, x: parseInt(atts[1].nodeValue), y: parseInt(atts[2].nodeValue), width: parseInt(atts[3].nodeValue), height: parseInt(atts[4].nodeValue) });
+                });
+            }).then(() => {
+                this.start_screen();
+            });
+        });
+        this.spriteMapImage.src = "./assets/images/SpaceShooterRedux/Spritesheet/sheet.png";
     }
     start_screen() {
         let buttonOffset = 100;
@@ -34,17 +51,17 @@ class Game {
             window.addEventListener("keyup", (e) => this.keyUpHandler(e));
             window.setInterval(() => this.draw(), 1000 / 30);
         }, 24, true);
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width / 2, 500);
+        this.addImage("meteorBrown_big1.png", this.canvas.width / 2, 500);
     }
     level_screen() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
+            this.addImage("playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         this.drawRandomAsteroids();
         this.spaceShipLoc = { x: this.canvas.width / 2, y: this.canvas.height - 200 };
         this.spaceShipRot = 0;
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
+        this.addImage("layerShip1_blue.png", this.canvas.width / 2, this.canvas.height - 200);
     }
     title_screen() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -64,23 +81,23 @@ class Game {
         this.writeText(text, this.canvas.width / 2, y, fontSize, "center", fontFamily, color);
     }
     addImage(src, x, y, rot = 0, callback = null, shouldCenter = true) {
-        let image = new Image;
-        image.addEventListener('load', () => {
-            this.ctx.save();
-            this.ctx.translate(x, y);
-            this.ctx.rotate(rot * Math.PI / 180);
-            if (shouldCenter)
-                this.ctx.translate(-image.width / 2, -image.height / 2);
-            this.ctx.drawImage(image, 0, 0);
-            if (shouldCenter)
-                this.ctx.translate(image.width / 2, image.height / 2);
-            this.ctx.rotate(-rot * Math.PI / 180);
-            this.ctx.translate(-x, -y);
-            this.ctx.restore();
-            if (callback)
-                callback(image);
-        });
-        image.src = src;
+        let image = this.spriteMapData.filter(obj => {
+            return obj.name === src;
+        })[0];
+        if (!image)
+            return;
+        this.ctx.translate(x, y);
+        this.ctx.rotate(rot * Math.PI / 180);
+        if (shouldCenter)
+            this.ctx.translate(-image.width / 2, -image.height / 2);
+        this.ctx.drawImage(this.spriteMapImage, image.x, image.y, image.width, image.height, 0, 0, image.width, image.height);
+        if (shouldCenter)
+            this.ctx.translate(image.width / 2, image.height / 2);
+        this.ctx.rotate(-rot * Math.PI / 180);
+        this.ctx.translate(-x, -y);
+        this.ctx.restore();
+        if (callback)
+            callback(image);
     }
     addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
         let image = new Image;
@@ -144,7 +161,7 @@ class Game {
         ];
         let asteroidType = imageCount[this.randomNumber(0, imageCount.length - 1)];
         let subImage = asteroidType.images[this.randomNumber(0, asteroidType.images.length - 1)];
-        let spriteSrc = `./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`;
+        let spriteSrc = `meteor${asteroidType.name}${subImage}.png`;
         this.addImage(spriteSrc, x, y, 0, (image) => {
             this.ctx.clearRect(x - image.width / 2, y - image.height / 2, image.width, image.height);
             callback({ src: spriteSrc, x: x, y: y, w: image.width, h: image.height });
@@ -237,7 +254,7 @@ class Game {
         this.ctx.rotate(this.spaceShipRot * Math.PI / 180);
         this.ctx.clearRect(-shipWidth / 2, -shipHeight / 2, shipWidth, shipHeight);
         this.ctx.restore();
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
+        this.addImage("playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
         if (!this.asteroidSprite)
             return;
         this.asteroidSprite.forEach((_, i) => {

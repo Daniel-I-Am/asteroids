@@ -21,11 +21,23 @@ interface ImageDetails {
     h: number;
 }
 
+interface SpriteSheetTexture {
+    name: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 class Game {
     //global attr for canvas
     //readonly attributes must be initialized in the constructor
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
+
+    //spriteMap objects
+    private readonly spriteMapImage: HTMLImageElement;
+    private spriteMapData: SpriteSheetTexture[];
 
     //some global player attributes
     private readonly player: string = "Player1";
@@ -76,10 +88,26 @@ class Game {
         ]
 
         // all screens: uncomment to activate 
-        this.start_screen();
-        // this.level_screen();
-        // this.title_screen();
-
+        this.spriteMapImage = new Image;
+        this.spriteMapImage.addEventListener('load', () => {
+            fetch('./assets/images/SpaceShooterRedux/Spritesheet/sheet.xml')
+                .then((response) => {
+                    return response.text()
+                })
+                .then((str) => {
+                    let parser = new DOMParser();
+                    this.spriteMapData = [];
+                    //<SubTexture name="beam0.png" x="143" y="377" width="43" height="31"/>
+                    Array.prototype.forEach.call(parser.parseFromString(str, "text/xml").getElementsByTagName("SubTexture"), (e: Element) => {
+                        let atts = e.attributes;
+                        this.spriteMapData.push({name: atts[0].nodeValue, x: parseInt(atts[1].nodeValue), y: parseInt(atts[2].nodeValue), width: parseInt(atts[3].nodeValue), height: parseInt(atts[4].nodeValue)});
+                    });
+                    //console.table(this.spriteMapData);
+                }).then(() => {
+                    this.start_screen();
+                });
+        });
+        this.spriteMapImage.src = "./assets/images/SpaceShooterRedux/Spritesheet/sheet.png";
     }
 
     //-------- Splash screen methods ------------------------------------
@@ -102,7 +130,7 @@ class Game {
             window.setInterval(() => this.draw(), 1000/30);
         }, 24, true);
         //4. add Asteroid image
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", this.canvas.width/2, 500);
+        this.addImage("meteorBrown_big1.png", this.canvas.width/2, 500);
     }
 
     //-------- level screen methods -------------------------------------
@@ -114,7 +142,7 @@ class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. load life images
         for (let i = 0; i<this.lives; i++)
-            this.addImage("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
+            this.addImage("playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
         //2. draw current score
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         //3. draw random asteroids
@@ -122,7 +150,7 @@ class Game {
         //4. draw player spaceship
         this.spaceShipLoc = {x: this.canvas.width/2, y: this.canvas.height - 200}
         this.spaceShipRot = 0;
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
+        this.addImage("layerShip1_blue.png", this.canvas.width/2, this.canvas.height - 200);
     }
 
     //-------- Title screen methods -------------------------------------
@@ -214,23 +242,22 @@ class Game {
         callback: Function = null,
         shouldCenter: boolean = true
     ) {
-        let image: HTMLImageElement = new Image;
-        image.addEventListener('load', () => {
-            this.ctx.save();
-            this.ctx.translate(x, y);
-            this.ctx.rotate(rot*Math.PI/180);
-            if (shouldCenter)
-                this.ctx.translate(-image.width/2, -image.height/2);
-            this.ctx.drawImage(image, 0, 0);
-            if (shouldCenter)
-                this.ctx.translate(image.width/2, image.height/2);
-            this.ctx.rotate(-rot*Math.PI/180);
-            this.ctx.translate(-x, -y);
-            this.ctx.restore();
-            if (callback)
-                callback(image);
-        });
-        image.src = src;
+        let image = this.spriteMapData.filter(obj => {
+            return obj.name === src
+        })[0];
+        if (!image) return;
+        this.ctx.translate(x, y);
+        this.ctx.rotate(rot*Math.PI/180);
+        if (shouldCenter)
+            this.ctx.translate(-image.width/2, -image.height/2);
+        this.ctx.drawImage(this.spriteMapImage, image.x, image.y, image.width, image.height, 0, 0, image.width, image.height);
+        if (shouldCenter)
+            this.ctx.translate(image.width/2, image.height/2);
+        this.ctx.rotate(-rot*Math.PI/180);
+        this.ctx.translate(-x, -y);
+        this.ctx.restore();
+        if (callback)
+            callback(image);
     }
 
     /**
@@ -326,7 +353,7 @@ class Game {
         // randomize asteroid
         let asteroidType: AsteroidImage = imageCount[this.randomNumber(0, imageCount.length-1)];
         let subImage: number = asteroidType.images[this.randomNumber(0, asteroidType.images.length-1)];
-        let spriteSrc = `./assets/images/SpaceShooterRedux/PNG/Meteors/meteor${asteroidType.name}${subImage}.png`;
+        let spriteSrc = `meteor${asteroidType.name}${subImage}.png`;
         // draw image, all the madness is inside this.addImage
         this.addImage(spriteSrc, x, y, 0, (image: HTMLImageElement) => {
             // we just need to parameters of the drawing for the callback, so immidiately remove the asteroid, this.draw takes care of drawing
@@ -434,7 +461,7 @@ class Game {
         this.ctx.restore();
 
         // draw new ship, luckely all the madness lies in the function this.addImage
-        this.addImage("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
+        this.addImage("playerShip1_blue.png", this.spaceShipLoc.x, this.spaceShipLoc.y, this.spaceShipRot);
 
         // if there's no asteroids, stop here
         if (!this.asteroidSprite) return;
