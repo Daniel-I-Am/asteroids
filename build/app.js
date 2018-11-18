@@ -98,7 +98,7 @@ class Game {
         this.ctx.restore();
         return image;
     }
-    addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true) {
+    addButton(src, text, x, y, eventType, callback, fontSize, shouldCenter = true, singleFire = true) {
         let image = new Image;
         image.addEventListener('load', () => {
             let tl, br;
@@ -119,7 +119,8 @@ class Game {
             let _listener = (event) => {
                 if (event.x > tl.x && event.x < br.x &&
                     event.y > tl.y && event.y < br.y) {
-                    this.canvas.removeEventListener(eventType, _listener);
+                    if (singleFire)
+                        this.canvas.removeEventListener(eventType, _listener);
                     callback();
                 }
             };

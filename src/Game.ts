@@ -277,7 +277,8 @@ class Game {
         eventType: string,
         callback: Function,
         fontSize: number,
-        shouldCenter: boolean = true
+        shouldCenter: boolean = true,
+        singleFire: boolean = true
     ) {
         let image = new Image;
         image.addEventListener('load', () => {
@@ -300,7 +301,8 @@ class Game {
                     event.x > tl.x && event.x < br.x &&
                     event.y > tl.y && event.y < br.y
                 ) {
-                    this.canvas.removeEventListener(eventType, _listener);
+                    if (singleFire)
+                        this.canvas.removeEventListener(eventType, _listener);
                     callback();
                 }
             };
