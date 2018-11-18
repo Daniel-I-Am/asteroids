@@ -295,14 +295,16 @@ class Game {
             }
             if (!callback)
                 return;
-            this.canvas.addEventListener(eventType, (event: MouseEvent) => {
+            let _listener = (event: MouseEvent) => {
                 if (
                     event.x > tl.x && event.x < br.x &&
                     event.y > tl.y && event.y < br.y
                 ) {
+                    this.canvas.removeEventListener(eventType, _listener);
                     callback();
                 }
-            });
+            };
+            this.canvas.addEventListener(eventType, _listener);
         });
         image.src = src;
     }
