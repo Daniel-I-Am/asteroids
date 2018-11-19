@@ -288,7 +288,7 @@ class ViewBase {
             this.HandleOnClick(xPos, yPos);
         };
         this.canvas = canvas;
-        this.canvasHelper = new CanvasHelper();
+        this.canvasHelper = new CanvasHelper(this.canvas);
     }
     render() {
         this.canvasHelper.clear();
@@ -296,7 +296,13 @@ class ViewBase {
     }
 }
 class CanvasHelper {
-    clear() { }
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = this.canvas.getContext('2d');
+    }
+    clear() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 }
 class MenuView extends ViewBase {
     constructor(canvas) {
