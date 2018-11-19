@@ -34,6 +34,7 @@ class Game {
                     let atts = e.attributes;
                     this.spriteMapData.push({ name: atts[0].nodeValue, x: parseInt(atts[1].nodeValue), y: parseInt(atts[2].nodeValue), width: parseInt(atts[3].nodeValue), height: parseInt(atts[4].nodeValue) });
                 });
+                console.table(this.spriteMapData);
             }).then(() => {
                 this.start_screen();
             });
@@ -56,7 +57,7 @@ class Game {
     level_screen() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.lives; i++)
-            this.addImage("playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
+            this.addImage("playerLife1_blue.png", 50 + i * 32, 30, 0, false);
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         this.drawRandomAsteroids();
         this.spaceShipLoc = { x: this.canvas.width / 2, y: this.canvas.height - 200 };
@@ -80,7 +81,7 @@ class Game {
     centerText(text, y, fontSize, fontFamily = "Minecraft", color = "#ffffff") {
         this.writeText(text, this.canvas.width / 2, y, fontSize, "center", fontFamily, color);
     }
-    addImage(src, x, y, rot = 0, callback = null, shouldCenter = true) {
+    addImage(src, x, y, rot = 0, shouldCenter = true) {
         let image = this.spriteMapData.filter(obj => {
             return obj.name === src;
         })[0];

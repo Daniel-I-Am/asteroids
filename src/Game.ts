@@ -102,7 +102,7 @@ class Game {
                         let atts = e.attributes;
                         this.spriteMapData.push({name: atts[0].nodeValue, x: parseInt(atts[1].nodeValue), y: parseInt(atts[2].nodeValue), width: parseInt(atts[3].nodeValue), height: parseInt(atts[4].nodeValue)});
                     });
-                    //console.table(this.spriteMapData);
+                    console.table(this.spriteMapData);
                 }).then(() => {
                     this.start_screen();
                 });
@@ -142,7 +142,7 @@ class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //1. load life images
         for (let i = 0; i<this.lives; i++)
-            this.addImage("playerLife1_blue.png", 50 + i * 32, 30, 0, null, false);
+            this.addImage("playerLife1_blue.png", 50 + i * 32, 30, 0, false);
         //2. draw current score
         this.writeText(`Score: ${this.score.toString()}`, this.canvas.width - 50, 50, 32, "right");
         //3. draw random asteroids
@@ -238,7 +238,6 @@ class Game {
         x: number,
         y: number,
         rot: number = 0,
-        callback: Function = null,
         shouldCenter: boolean = true
     ): SpriteSheetTexture {
         let image = this.spriteMapData.filter(obj => {
