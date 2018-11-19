@@ -282,4 +282,26 @@ let init = function () {
     Asteroids = new Game(document.getElementById('canvas'));
 };
 window.addEventListener('load', init);
+class ViewBase {
+    constructor(canvas) {
+        this.OnClick = (xPos, yPos) => {
+            this.HandleOnClick(xPos, yPos);
+        };
+        this.canvas = canvas;
+        this.canvasHelper = new CanvasHelper();
+    }
+    render() {
+        this.canvasHelper.clear();
+    }
+}
+class CanvasHelper {
+    clear() { }
+}
+class MenuView extends ViewBase {
+    constructor(canvas) {
+        super(canvas);
+        this.HandleOnClick = (xPos, yPos) => { };
+    }
+    RenderScreen() { }
+}
 //# sourceMappingURL=app.js.map
