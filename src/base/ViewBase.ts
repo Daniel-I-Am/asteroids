@@ -9,6 +9,7 @@ abstract class ViewBase {
 
     public render(): void {
         this.canvasHelper.clear();
+        this.RenderScreen();
     }
 
     private OnClick = (xPos: number, yPos: number) => {

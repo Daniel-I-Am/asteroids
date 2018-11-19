@@ -292,6 +292,7 @@ class ViewBase {
     }
     render() {
         this.canvasHelper.clear();
+        this.RenderScreen();
     }
 }
 class CanvasHelper {
