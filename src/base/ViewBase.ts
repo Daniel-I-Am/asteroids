@@ -5,10 +5,10 @@
  */
 abstract class ViewBase {
 
-    protected readonly d_canvasHelper : CanvasHelper;
-    protected readonly d_changeViewCallback : (aNewView : ViewBase) => void;
+    protected readonly d_canvasHelper: CanvasHelper;
+    protected readonly d_changeViewCallback: (aNewView: ViewBase) => void;
 
-    private d_alive : boolean = true;
+    private d_alive: boolean = true;
 
     /**
      * Constructor
@@ -16,7 +16,7 @@ abstract class ViewBase {
      * @param {HTMLCanvasElement} aCanvas - the canvas where to render to
      * @param aChangeViewCallback -
      */
-    protected constructor(aCanvas: HTMLCanvasElement,aChangeViewCallback : (aNewView : ViewBase) => void ) {
+    protected constructor(aCanvas: HTMLCanvasElement,aChangeViewCallback: (aNewView: ViewBase) => void ) {
 
         // construct our helper class
 
@@ -33,7 +33,7 @@ abstract class ViewBase {
      * Handles the internal redirection of the click event.
      * @param {MouseEvent} Event - the class containing information for the event
      */
-    private OnClick = (aXaxis : number, aYaxis : number) : void => {
+    private OnClick = (aXaxis: number, aYaxis: number): void => {
         // handle some flow control based upon the X and Y if necessary
         // but only if this is the same for any screen (e.g. space = pause)
 
@@ -47,7 +47,7 @@ abstract class ViewBase {
      * @AccessModifier {Public}
      * Handles the drawing of screens in general
      */
-    public Render() : void {
+    public Render(): void {
         // let the helper clear the screen
         // call the derived RenderScreen method
     }
@@ -57,7 +57,7 @@ abstract class ViewBase {
      * @AccessModifier {Public}
      * Handles the cleanup
      */
-    public BeforeExit() : void {
+    public BeforeExit(): void {
         // Clear any lingering events.
         this.d_alive = false; // workaround for now
     }

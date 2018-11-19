@@ -8,11 +8,11 @@ class MenuView extends ViewBase
      * @param {HTMLCanvasElement} aCanvas - the canvas where to render to
      * @param aChangeViewCallback -
      */
-    public constructor(aCanvas : HTMLCanvasElement,aChangeViewCallback : (aNewView : ViewBase) => void ) {
+    public constructor(aCanvas: HTMLCanvasElement, aChangeViewCallback: (aNewView: ViewBase) => void ) {
         super(aCanvas,aChangeViewCallback);
     }
 
-    protected HandleClick = (aXpos: number, aYpos: number) : void => {
+    protected HandleClick = (aXpos: number, aYpos: number): void => {
         // get the centerCoordinate
         let centerCoordinate = this.d_canvasHelper.GetCenter();
         if (aXpos > centerCoordinate.X - 111 && aXpos < centerCoordinate.X + 111) {

@@ -46,7 +46,7 @@ class CanvasHelper {
      * @AccessModifier {public}
      * returns the center coordinate
      */
-    public GetCenter() : {X : number, Y: number} {
+    public GetCenter(): {X: number, Y: number} {
         // return the center as a valid return
         return {X: this.GetWidth(), Y: this.GetHeight()};
     }
@@ -56,7 +56,7 @@ class CanvasHelper {
      * @AccessModifier {public}
      * returns Height of the canvas
      */
-    public GetHeight() : number {
+    public GetHeight(): number {
         // return the height of te canvas
         return this.canvas.height;
     }
@@ -66,7 +66,7 @@ class CanvasHelper {
      * @AccessModifier {public}
      * returns the Width of the canvas
      */
-    public GetWidth() : number {
+    public GetWidth(): number {
         // return the height of the canvas
         return this.canvas.width;
     }
