@@ -234,7 +234,8 @@ class Game {
      * @param {boolean} shouldCenter Whether the image should be put relative to it's center 
      * @returns {SpriteSheetTexture} Image object
      */
-    private addImage(src: string,
+    private addImage(
+        src: string,
         x: number,
         y: number,
         rot: number = 0,
