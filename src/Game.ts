@@ -245,16 +245,13 @@ class Game {
             return obj.name === src
         })[0];
         if (!image) return null;
+        this.ctx.save();
         this.ctx.translate(x, y);
         this.ctx.rotate(rot*Math.PI/180);
         if (shouldCenter)
             this.ctx.translate(-image.width/2, -image.height/2);
         this.ctx.drawImage(this.spriteMapImage, image.x, image.y, image.width, image.height, 0, 0, image.width, image.height);
-        if (shouldCenter)
-            this.ctx.translate(image.width/2, image.height/2);
-        this.ctx.rotate(-rot*Math.PI/180);
-        this.ctx.translate(-x, -y);
-        this.ctx.restore();
+        this.ctx.restore(); 
         return image;
     }
 
