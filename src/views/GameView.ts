@@ -11,4 +11,6 @@ class GameView extends ViewBase
 
 
     // provide the missing content
+    protected HandleClick = () => {}
+    protected RenderScreen() {}
 }

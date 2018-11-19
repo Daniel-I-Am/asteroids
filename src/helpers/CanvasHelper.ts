@@ -48,6 +48,7 @@ class CanvasHelper {
      */
     public GetCenter() : {X : number, Y: number} {
         // return the center as a valid return
+        return {X: this.GetWidth(), Y: this.GetHeight()};
     }
 
     /**
@@ -57,6 +58,7 @@ class CanvasHelper {
      */
     public GetHeight() : number {
         // return the height of te canvas
+        return this.canvas.height;
     }
 
     /**
@@ -66,6 +68,7 @@ class CanvasHelper {
      */
     public GetWidth() : number {
         // return the height of the canvas
+        return this.canvas.width;
     }
 
     /**
