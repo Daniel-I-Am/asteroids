@@ -232,7 +232,7 @@ class Game {
      * @param {number} y Y-location to put the center of the image
      * @param {number} rot Rotation to use in degrees
      * @param {boolean} shouldCenter Whether the image should be put relative to it's center 
-     * @returns {number, number} Size of image
+     * @returns {SpriteSheetTexture} Image object
      */
     private addImage(src: string,
         x: number,
