@@ -52,16 +52,15 @@ class Game {
         this.canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
 
         //2. add 'Press to play' text
-        this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 20);
+        this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
 
         //3. add button with 'start' text
-        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", null);
+        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y+200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, null);
 
         //4. add Asteroid image
         this.canvasHelper.writeImageToCanvas(
             "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-            center.X - 50,
-            center.Y + 40
+            center.X, center.Y
         );
     }
 
@@ -77,7 +76,7 @@ class Game {
             this.canvasHelper.writeImageToCanvas(lifeImagePath, 20 + 32*i, 20, 0);
 
         //2. draw current score
-        this.canvasHelper.writeTextToCanvas(`Score: ${this.score}`, 20, this.canvasHelper.GetWidth() - 150, 65, undefined, "right");
+        this.canvasHelper.writeTextToCanvas(`Score: ${this.score}`, 20, this.canvasHelper.GetWidth() - 150, 65, undefined, undefined, "right");
 
         //3. draw random asteroids
         const asteroids: Array<string> = [
