@@ -52,12 +52,14 @@ abstract class ViewBase {
      */
     public Render(): void {
         // let the helper clear the screen
+        this.d_canvasHelper.Clear();
         // call the derived RenderScreen method
+        this.RenderScreen();
     }
 
     /**
      * BeforeExit
-     * @AccessModifier {Public}
+     * @access public
      * Handles the cleanup
      */
     public BeforeExit(): void {
@@ -72,7 +74,7 @@ abstract class ViewBase {
     // ------------------------------------------------------------------------------------
     /**
      * OnClick
-     * @AccessModifier {Protected}
+     * @access protected
      * Handles the internal redirection of the click event.
      * @param {number} X - the x position of the mouseclick
      * @param {number} Y - the class containing information for the event

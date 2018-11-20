@@ -189,6 +189,8 @@ class ViewBase {
         this.d_canvasHelper.RegisterOnClick(this.OnClick);
     }
     Render() {
+        this.d_canvasHelper.Clear();
+        this.RenderScreen();
     }
     BeforeExit() {
         this.d_alive = false;
@@ -206,12 +208,21 @@ class MenuView extends ViewBase {
             const center = this.d_canvasHelper.GetCenter();
             if (aXpos > center.X - 111 && aXpos < center.X + 111) {
                 if (aYpos > center.Y + 219 && aYpos < center.Y + 259) {
+                    this.d_canvasHelper.Clear();
                     this.d_changeViewCallback(new GameView(this.d_canvasHelper.getCanvas(), this.d_changeViewCallback));
                 }
             }
         };
     }
     RenderScreen() {
+        const center = this.d_canvasHelper.GetCenter();
+        this.d_canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
+        this.d_canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
+        this.d_canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
+            this.d_canvasHelper.Clear();
+            console.log("this.level_screen();");
+        });
+        this.d_canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", center.X, center.Y);
     }
 }
 class GameView extends ViewBase {
