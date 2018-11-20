@@ -26,7 +26,7 @@ class Game {
         const center = this.canvasHelper.GetCenter();
         this.canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
         this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
-        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, null);
+        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, console.log);
         this.canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", center.X, center.Y);
     }
     level_screen() {
@@ -163,7 +163,7 @@ class CanvasHelper {
         this.canvas.addEventListener("click", (event) => {
             if (event.x > aXpos - buttonElement.width / 2 && event.x < aXpos + buttonElement.width / 2 + 111) {
                 if (event.y > aYpos - buttonElement.height / 2 && event.y < aYpos + buttonElement.height / 2) {
-                    callback();
+                    callback(event);
                 }
             }
         });

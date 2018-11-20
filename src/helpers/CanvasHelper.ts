@@ -155,7 +155,7 @@ class CanvasHelper {
         this.canvas.addEventListener("click", (event: MouseEvent) => {
             if (event.x > aXpos - buttonElement.width/2 && event.x < aXpos + buttonElement.width/2 + 111) {
                 if (event.y > aYpos - buttonElement.height/2 && event.y < aYpos + buttonElement.height/2) {
-                    callback();
+                    callback(event);
                 }
             }
         });
