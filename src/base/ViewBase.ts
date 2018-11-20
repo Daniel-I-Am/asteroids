@@ -16,15 +16,17 @@ abstract class ViewBase {
      * @param {HTMLCanvasElement} aCanvas - the canvas where to render to
      * @param aChangeViewCallback -
      */
-    protected constructor(aCanvas: HTMLCanvasElement,aChangeViewCallback: (aNewView: ViewBase) => void ) {
+    protected constructor(aCanvas: HTMLCanvasElement, aChangeViewCallback: (aNewView: ViewBase) => void ) {
 
         // construct our helper class
+        this.d_canvasHelper = new CanvasHelper(aCanvas);
 
         // store the callback for viewchanges
+        this.d_changeViewCallback = aChangeViewCallback;
 
         // let our helper class handle the click handling
-        // and let him pass the result ro our method
-
+        // and let him pass the result to our method
+        this.d_canvasHelper.RegisterOnClick(this.OnClick);
     }
 
     /**
@@ -39,6 +41,7 @@ abstract class ViewBase {
 
         if (!this.d_alive) return; // workaround to solve lingering onClick events
         // call a method that is implemented in the derived class
+        this.HandleClick(aXaxis, aYaxis);
 
     }
 

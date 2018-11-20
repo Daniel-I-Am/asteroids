@@ -182,7 +182,11 @@ class ViewBase {
         this.OnClick = (aXaxis, aYaxis) => {
             if (!this.d_alive)
                 return;
+            this.HandleClick(aXaxis, aYaxis);
         };
+        this.d_canvasHelper = new CanvasHelper(aCanvas);
+        this.d_changeViewCallback = aChangeViewCallback;
+        this.d_canvasHelper.RegisterOnClick(this.OnClick);
     }
     Render() {
     }
