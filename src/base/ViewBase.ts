@@ -22,6 +22,7 @@ abstract class ViewBase {
         this.d_canvasHelper = new CanvasHelper(aCanvas);
 
         // store the callback for viewchanges
+        console.log(aChangeViewCallback);
         this.d_changeViewCallback = aChangeViewCallback;
 
         // let our helper class handle the click handling

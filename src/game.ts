@@ -7,7 +7,7 @@ class Game {
     private readonly player: string = "Player1";
     private readonly score: number = 400;
     private readonly lives: number = 3;
-    private readonly highscores: Array<any>; //TODO: do not use 'any': write an interface!
+    private readonly highscores: Array<Score>; //TODO: do not use 'any': write an interface!
 
     private leftPressed: boolean;
     private upPressed: boolean;
@@ -36,42 +36,16 @@ class Game {
         ]
 
         // render the current screen
-        this.d_currentView = new MenuView(canvasId, this.ChangeView)
+        this.d_currentView = new MenuView(canvasId, this.ChangeView);
         this.d_currentView.Render();
     }
 
-    private ChangeView(aNewView: ViewBase): void {
+    private ChangeView = (aNewView: ViewBase): void => {
+        console.log("Game.ChangeView", this)
         this.d_currentView.BeforeExit();
         this.d_currentView = aNewView;
         this.d_currentView.Render();    
     }
-
-    //-------- Title screen methods -------------------------------------
-
-    /**
-     * Function to initialize the title screen
-     */
-    public title_screen() {
-        const center = this.canvasHelper.GetCenter();
-
-        //1. draw your score
-        this.canvasHelper.writeTextToCanvas(`${this.player} score is ${this.score}`, 80, center.X, center.Y - 100);
-
-        //2. draw all highscores
-        this.canvasHelper.writeTextToCanvas("HIGHSCORES", 40, center.X, center.Y);
-
-        this.highscores.forEach((element, index) => {
-            center.Y += 40;
-
-            this.canvasHelper.writeTextToCanvas(
-                `${index + 1}: ${element.playerName} - ${element.score}`,
-                20,
-                center.X,
-                center.Y
-            );
-        });
-    }
-
     //-------Generic canvas functions ----------------------------------
 
     private draw() {
@@ -125,7 +99,7 @@ class Game {
 }
 
 //this will get an HTML element. I cast this element in de appropriate type using <>
-let Asteroids;
+let Asteroids: Game;
 let init = function () {
     Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
     // const Asteroids2 = new Game(<HTMLCanvasElement>document.getElementById('canvas2'));

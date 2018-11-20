@@ -5,6 +5,12 @@ class Game {
         this.lives = 3;
         this.shipXOffset = 50;
         this.shipYOffset = 37;
+        this.ChangeView = (aNewView) => {
+            console.log("Game.ChangeView", this);
+            this.d_currentView.BeforeExit();
+            this.d_currentView = aNewView;
+            this.d_currentView.Render();
+        };
         this.canvasHelper = new CanvasHelper(canvasId);
         this.highscores = [
             {
@@ -22,20 +28,6 @@ class Game {
         ];
         this.d_currentView = new MenuView(canvasId, this.ChangeView);
         this.d_currentView.Render();
-    }
-    ChangeView(aNewView) {
-        this.d_currentView.BeforeExit();
-        this.d_currentView = aNewView;
-        this.d_currentView.Render();
-    }
-    title_screen() {
-        const center = this.canvasHelper.GetCenter();
-        this.canvasHelper.writeTextToCanvas(`${this.player} score is ${this.score}`, 80, center.X, center.Y - 100);
-        this.canvasHelper.writeTextToCanvas("HIGHSCORES", 40, center.X, center.Y);
-        this.highscores.forEach((element, index) => {
-            center.Y += 40;
-            this.canvasHelper.writeTextToCanvas(`${index + 1}: ${element.playerName} - ${element.score}`, 20, center.X, center.Y);
-        });
     }
     draw() {
         if (this.leftPressed) {
@@ -140,13 +132,7 @@ class CanvasHelper {
         buttonElement.src = aSrc;
         if (!callback)
             return;
-        this.canvas.addEventListener("click", (event) => {
-            if (event.x > aXpos - buttonElement.width / 2 && event.x < aXpos + buttonElement.width / 2) {
-                if (event.y > aYpos - buttonElement.height / 2 && event.y < aYpos + buttonElement.height / 2) {
-                    callback(event);
-                }
-            }
-        });
+        this.RegisterOnClick(callback);
     }
 }
 class ViewBase {
@@ -158,6 +144,7 @@ class ViewBase {
             this.HandleClick(aXaxis, aYaxis);
         };
         this.d_canvasHelper = new CanvasHelper(aCanvas);
+        console.log(aChangeViewCallback);
         this.d_changeViewCallback = aChangeViewCallback;
         this.d_canvasHelper.RegisterOnClick(this.OnClick);
     }
@@ -178,6 +165,7 @@ class MenuView extends ViewBase {
     constructor(aCanvas, aChangeViewCallback) {
         super(aCanvas, aChangeViewCallback);
         this.HandleClick = (aXpos, aYpos) => {
+            console.log("MenuView.HandleClick", this);
             const center = this.d_canvasHelper.GetCenter();
             if (aXpos > center.X - 111 && aXpos < center.X + 111) {
                 if (aYpos > center.Y + 219 && aYpos < center.Y + 259) {
@@ -191,10 +179,8 @@ class MenuView extends ViewBase {
         const center = this.d_canvasHelper.GetCenter();
         this.d_canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
         this.d_canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
-        this.d_canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
-            this.d_canvasHelper.Clear();
-            console.log("this.level_screen();");
-        });
+        console.log("MenuView.RenderScreen", this);
+        this.d_canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, this.HandleClick);
         this.d_canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", center.X, center.Y);
     }
 }
@@ -228,6 +214,39 @@ class GameView extends ViewBase {
             const index = MathHelper.randomNumber(0, asteroids.length);
             this.d_canvasHelper.writeImageToCanvas(asteroids[index], MathHelper.randomNumber(0, this.d_canvasHelper.GetWidth()), MathHelper.randomNumber(0, this.d_canvasHelper.GetHeight()));
         }
+    }
+}
+class ScoreView extends ViewBase {
+    constructor(aCanvas, aChangeViewCallback) {
+        super(aCanvas, aChangeViewCallback);
+        this.HandleClick = (aXpos, aYpos) => {
+            console.log("MenuView.HandleClick", this);
+            const center = this.d_canvasHelper.GetCenter();
+            if (aXpos > center.X - 111 && aXpos < center.X + 111) {
+                if (aYpos > center.Y + 219 && aYpos < center.Y + 259) {
+                    this.d_canvasHelper.Clear();
+                    this.d_changeViewCallback(new MenuView(this.d_canvasHelper.getCanvas(), this.d_changeViewCallback));
+                }
+            }
+        };
+    }
+    setScore(aScore) {
+        this.score = aScore;
+    }
+    setPlayer(aName) {
+        this.player = aName;
+    }
+    setHighscores(aScores) {
+        this.highscores = aScores;
+    }
+    RenderScreen() {
+        const center = this.d_canvasHelper.GetCenter();
+        this.d_canvasHelper.writeTextToCanvas(`${this.player} score is ${this.score}`, 80, center.X, center.Y - 100);
+        this.d_canvasHelper.writeTextToCanvas("HIGHSCORES", 40, center.X, center.Y);
+        this.highscores.forEach((element, index) => {
+            center.Y += 40;
+            this.d_canvasHelper.writeTextToCanvas(`${index + 1}: ${element.playerName} - ${element.score}`, 20, center.X, center.Y);
+        });
     }
 }
 //# sourceMappingURL=app.js.map

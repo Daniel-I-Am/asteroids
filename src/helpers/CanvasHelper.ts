@@ -139,7 +139,7 @@ class CanvasHelper {
         aYpos: number, 
         aSrc: string = "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png",
         aFontSize: number = 20,
-        callback: Function = null,
+        callback: (aXpos: number, aYpos: number) => void = null,
     ) {
         let buttonElement = new Image();
 
@@ -153,14 +153,6 @@ class CanvasHelper {
         buttonElement.src = aSrc;
 
         if (!callback) return;
-        this.canvas.addEventListener("click", (event: MouseEvent) => {
-            if (event.x > aXpos - buttonElement.width/2 && event.x < aXpos + buttonElement.width/2) {
-                if (event.y > aYpos - buttonElement.height/2 && event.y < aYpos + buttonElement.height/2) {
-                    callback(event);
-                }
-            }
-        });
+        this.RegisterOnClick(callback);
     }
-
-
 }

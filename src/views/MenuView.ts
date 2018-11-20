@@ -13,6 +13,7 @@ class MenuView extends ViewBase
     }
 
     protected HandleClick = (aXpos: number, aYpos: number): void => {
+        console.log("MenuView.HandleClick", this);
         // get the center
         const center = this.d_canvasHelper.GetCenter();
         if (aXpos > center.X - 111 && aXpos < center.X + 111) {
@@ -36,17 +37,11 @@ class MenuView extends ViewBase
         this.d_canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
 
         //3. add button with 'start' text
-        this.d_canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y+200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
-            this.d_canvasHelper.Clear();
-            console.log("this.level_screen();");
-            //this.level_screen();
-        });
+        console.log("MenuView.RenderScreen", this);
+        this.d_canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y+200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, this.HandleClick);
 
         //4. add Asteroid image
-        this.d_canvasHelper.writeImageToCanvas(
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-            center.X, center.Y
-        );
+        this.d_canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", center.X, center.Y);
     }
 
 }
