@@ -138,13 +138,14 @@ class CanvasHelper {
         aXpos: number, 
         aYpos: number, 
         aSrc: string = "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png",
-        callback: Function,
+        aFontSize: number = 20,
+        callback: Function = null,
     ) {
         let buttonElement = new Image();
 
         buttonElement.addEventListener("load", () => {
-            this.ctx.drawImage(buttonElement, aXpos - buttonElement.width/2, aYpos + buttonElement.height/2);
-            this.writeTextToCanvas(aCaption, 20, aXpos, aYpos, "black");
+            this.ctx.drawImage(buttonElement, aXpos - buttonElement.width/2, aYpos - buttonElement.height/2);
+            this.writeTextToCanvas(aCaption, aFontSize, aXpos, aYpos, "black", "middle");
         });
 
         buttonElement.src = aSrc;
