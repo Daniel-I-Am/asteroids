@@ -81,12 +81,14 @@ class CanvasHelper {
         aXpos: number,
         aYpos: number,
         color: string = "white",
+        aTextBaseLine: CanvasTextBaseline = "bottom",
         fontFamily: string = "Minecraft",
         alignment: CanvasTextAlign = "center"
     ) {
         this.ctx.fillStyle = color;
         this.ctx.font = `${fontSize}px ${fontFamily}`;
         this.ctx.textAlign = alignment;
+        this.ctx.textBaseline = aTextBaseLine;
         this.ctx.fillText(text, aXpos, aYpos);
     }
 
