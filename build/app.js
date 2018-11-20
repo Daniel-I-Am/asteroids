@@ -123,16 +123,16 @@ class CanvasHelper {
         });
     }
     Clear() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.GetWidth(), this.GetHeight());
     }
     GetCenter() {
-        return { X: this.GetWidth(), Y: this.GetHeight() };
-    }
-    GetHeight() {
-        return this.canvas.height;
+        return { X: this.GetWidth() / 2, Y: this.GetHeight() / 2 };
     }
     GetWidth() {
         return this.canvas.width;
+    }
+    GetHeight() {
+        return this.canvas.height;
     }
     getCanvas() {
         return this.canvas;

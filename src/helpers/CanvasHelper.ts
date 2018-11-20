@@ -29,9 +29,9 @@ class CanvasHelper {
     /**
      * Clears screen
      */
-    public Clear() {
+    public Clear(): void {
         // clear the screen
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.GetWidth(), this.GetHeight());
     }
 
     /**
@@ -39,15 +39,7 @@ class CanvasHelper {
      */
     public GetCenter(): {X: number, Y: number} {
         // return the center as a valid return
-        return {X: this.GetWidth(), Y: this.GetHeight()};
-    }
-
-    /**
-     * Get the height of the canvas
-     */
-    public GetHeight(): number {
-        // return the height of te canvas
-        return this.canvas.height;
+        return {X: this.GetWidth()/2, Y: this.GetHeight()/2};
     }
 
     /**
@@ -56,6 +48,14 @@ class CanvasHelper {
     public GetWidth(): number {
         // return the height of the canvas
         return this.canvas.width;
+    }
+
+    /**
+     * Get the height of the canvas
+     */
+    public GetHeight(): number {
+        // return the height of te canvas
+        return this.canvas.height;
     }
 
     /**
