@@ -120,7 +120,7 @@ class CanvasHelper {
         return image;*/
         let element = new Image();
         element.addEventListener("load", () => {
-            this.ctx.drawImage(element, aXpos-element.width, aYpos-element.height);
+            this.ctx.drawImage(element, aXpos-element.width/2, aYpos-element.height/2);
         });
         element.src = aSrc;
     }
