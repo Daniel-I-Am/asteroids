@@ -20,7 +20,7 @@ class MenuView extends ViewBase
                 // clear the canvas
 
                 // change the View << is explained tomorrow
-                this.d_changeViewCallback(new GameView(this.d_canvasHelper.canvas,this.d_changeViewCallback));
+                this.d_changeViewCallback(new GameView(this.d_canvasHelper.getCanvas(),this.d_changeViewCallback));
             }
         }
     }

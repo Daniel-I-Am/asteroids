@@ -1,8 +1,6 @@
 class Game {
-    //global attr for canvas
-    //readonly attributes must be initialized in the constructor
-    private readonly canvas: HTMLCanvasElement;
-    private readonly ctx: CanvasRenderingContext2D;
+    //global attr for helpers
+    private readonly canvasHelper: CanvasHelper;
 
     //some global player attributes
     private readonly player: string = "Player1";
@@ -19,12 +17,7 @@ class Game {
     private shipYOffset: number = 37;
 
     public constructor(canvasId: HTMLCanvasElement) {
-        //construct all canvas
-        this.canvas = canvasId;
-        this.canvas.width = window.innerWidth;// /2; // for two on one row
-        this.canvas.height = window.innerHeight;// /2; // for two on the col
-        //set the context of the canvas
-        this.ctx = this.canvas.getContext('2d');
+        this.canvasHelper = new CanvasHelper(canvasId);
 
         this.highscores = [
             {
@@ -53,23 +46,22 @@ class Game {
      * Function to initialize the splash screen
      */
     public start_screen() {
-        const horizontalCenter = this.canvas.width / 2;
-        const verticalCenter = this.canvas.height / 2;
+        const center = this.canvasHelper.GetCenter();
 
         //1. add 'Asteroids' text
-        this.writeTextToCanvas("Asteroids", 140, horizontalCenter, 150);
+        this.canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
 
         //2. add 'Press to play' text
-        this.writeTextToCanvas("PRESS PLAY TO START", 40, horizontalCenter, verticalCenter - 20);
+        this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 20);
 
         //3. add button with 'start' text
-        this.writeButtonToCanvas();
+        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", null);
 
         //4. add Asteroid image
-        this.writeImageToCanvas(
+        this.canvasHelper.writeImageToCanvas(
             "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-            horizontalCenter - 50,
-            verticalCenter + 40
+            center.X - 50,
+            center.Y + 40
         );
     }
 
@@ -81,10 +73,11 @@ class Game {
         //1. load life images
         const lifeImagePath = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
 
-        this.writeImageToCanvas(lifeImagePath, 70, 50, 40, undefined, this.lives);
+        for (let i = 0; i < this.lives; i++)
+            this.canvasHelper.writeImageToCanvas(lifeImagePath, 20 + 32*i, 20, 0);
 
         //2. draw current score
-        this.writeTextToCanvas(`Score: ${this.score}`, 20, this.canvas.width - 150, 65, undefined, "right");
+        this.canvasHelper.writeTextToCanvas(`Score: ${this.score}`, 20, this.canvasHelper.GetWidth() - 150, 65, undefined, "right");
 
         //3. draw random asteroids
         const asteroids: Array<string> = [
@@ -103,12 +96,12 @@ class Game {
         const maxAsteroidsOnScreen: number = 5;
 
         for (let i = 0; i < maxAsteroidsOnScreen; i++) {
-            const index = this.randomNumber(0, asteroids.length);
+            const index = MathHelper.randomNumber(0, asteroids.length);
 
-            this.writeImageToCanvas(
+            this.canvasHelper.writeImageToCanvas(
                 asteroids[index],
-                this.randomNumber(0, this.canvas.width),
-                this.randomNumber(0, this.canvas.height)
+                MathHelper.randomNumber(0, this.canvasHelper.GetWidth()),
+                MathHelper.randomNumber(0, this.canvasHelper.GetHeight())
             );
         }
     }
@@ -119,106 +112,30 @@ class Game {
      * Function to initialize the title screen
      */
     public title_screen() {
-        const horizontalCenter = this.canvas.width / 2;
-        let verticalCenter = this.canvas.height / 2;
+        const center = this.canvasHelper.GetCenter();
 
         //1. draw your score
-        this.writeTextToCanvas(`${this.player} score is ${this.score}`, 80, horizontalCenter, verticalCenter - 100);
+        this.canvasHelper.writeTextToCanvas(`${this.player} score is ${this.score}`, 80, center.X, center.Y - 100);
 
         //2. draw all highscores
-        this.writeTextToCanvas("HIGHSCORES", 40, horizontalCenter, verticalCenter);
+        this.canvasHelper.writeTextToCanvas("HIGHSCORES", 40, center.X, center.Y);
 
         this.highscores.forEach((element, index) => {
-            verticalCenter += 40;
+            center.Y += 40;
 
-            this.writeTextToCanvas(
+            this.canvasHelper.writeTextToCanvas(
                 `${index + 1}: ${element.playerName} - ${element.score}`,
                 20,
-                horizontalCenter,
-                verticalCenter
+                center.X,
+                center.Y
             );
         });
     }
 
     //-------Generic canvas functions ----------------------------------
 
-    /**
-     * Renders a random number between min and max
-     * @param {number} min - minimal time
-     * @param {number} max - maximal time
-     */
-    public randomNumber(min: number, max: number): number {
-        return Math.round(Math.random() * (max - min) + min);
-    }
-
-    public writeTextToCanvas(
-        text: string,
-        fontSize: number,
-        xCoordinate: number,
-        yCoordinate: number,
-        color: string = "white",
-        alignment: CanvasTextAlign = "center"
-    ) {
-        this.ctx.font = `${fontSize}px Minecraft`;
-        this.ctx.fillStyle = color;
-        this.ctx.textAlign = alignment;
-        this.ctx.fillText(text, xCoordinate, yCoordinate);
-    }
-
-    public writeImageToCanvas(
-        src: string,
-        xCoordinate: number,
-        yCoordinate: number,
-        deltaX: number = 0,
-        deltaY: number = 0,
-        loops: number = 1
-    ) {
-        let element = document.createElement("img");
-        element.src = src;
-
-        for (let i = 0; i < loops; i++) {
-            element.addEventListener("load", () => {
-                xCoordinate += deltaX;
-                yCoordinate += deltaY;
-                this.ctx.drawImage(element, xCoordinate, yCoordinate);
-            });
-        }
-    }
-
-    /**
-     * Writes "Play" button to canvas.
-     * NOTE: This is all hard coded, but that's fine for now.
-     */
-    public writeButtonToCanvas() {
-        const horizontalCenter = this.canvas.width / 2;
-        const verticalCenter = this.canvas.height / 2;
-
-        let buttonElement = document.createElement("img");
-        buttonElement.src = "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png";
-
-        buttonElement.addEventListener("load", () => {
-            this.ctx.drawImage(buttonElement, horizontalCenter - 111, verticalCenter + 219);
-            this.writeTextToCanvas("Play", 20, horizontalCenter, verticalCenter + 245, "black");
-        });
-
-        this.canvas.addEventListener("click", (event: MouseEvent) => {
-            const horizontalCenter = this.canvas.width / 2 + this.canvas.offsetLeft; // << new line of code
-            const verticalCenter = this.canvas.height / 2 + this.canvas.offsetTop;// << new line of code
-            if (event.x > horizontalCenter - 111 && event.x < horizontalCenter + 111) {
-                if (event.y > verticalCenter + 219 && event.y < verticalCenter + 259) {
-                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    this.level_screen();
-                    window.addEventListener("keydown", (event) => this.keyDownHandler(event));
-                    window.addEventListener("keyup", (event) => this.keyUpHandler(event));
-
-                    window.setInterval(() => this.draw(), 1000 / 30);
-                }
-            }
-        });
-    }
-
     private draw() {
-        this.ctx.clearRect(this.shipXOffset, this.shipYOffset, this.canvas.width, this.canvas.height);
+        this.canvasHelper.Clear();
 
         if (this.leftPressed) {
             this.shipXOffset -= 2;
@@ -234,7 +151,7 @@ class Game {
         }
 
         //4. draw player spaceship
-        this.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2 + this.shipXOffset, this.canvas.height / 2 + this.shipYOffset);
+        this.canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvasHelper.GetWidth() / 2 + this.shipXOffset, this.canvasHelper.GetWidth() / 2 + this.shipYOffset);
     }
 
     private keyDownHandler(event: KeyboardEvent) {
