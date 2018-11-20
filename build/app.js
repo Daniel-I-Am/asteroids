@@ -20,40 +20,13 @@ class Game {
                 score: 200
             }
         ];
-        this.start_screen();
+        this.d_currentView = new MenuView(canvasId, this.ChangeView);
+        this.d_currentView.Render();
     }
-    start_screen() {
-        const center = this.canvasHelper.GetCenter();
-        this.canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
-        this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
-        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
-            this.canvasHelper.Clear();
-            this.level_screen();
-        });
-        this.canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", center.X, center.Y);
-    }
-    level_screen() {
-        const lifeImagePath = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
-        for (let i = 0; i < this.lives; i++)
-            this.canvasHelper.writeImageToCanvas(lifeImagePath, 20 + 32 * i, 20, 0);
-        this.canvasHelper.writeTextToCanvas(`Score: ${this.score}`, 20, this.canvasHelper.GetWidth() - 150, 65, undefined, undefined, "right");
-        const asteroids = [
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big2.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big3.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big4.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_med3.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_small2.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny2.png",
-        ];
-        const maxAsteroidsOnScreen = 5;
-        for (let i = 0; i < maxAsteroidsOnScreen; i++) {
-            const index = MathHelper.randomNumber(0, asteroids.length);
-            this.canvasHelper.writeImageToCanvas(asteroids[index], MathHelper.randomNumber(0, this.canvasHelper.GetWidth()), MathHelper.randomNumber(0, this.canvasHelper.GetHeight()));
-        }
+    ChangeView(aNewView) {
+        this.d_currentView.BeforeExit();
+        this.d_currentView = aNewView;
+        this.d_currentView.Render();
     }
     title_screen() {
         const center = this.canvasHelper.GetCenter();
@@ -65,7 +38,6 @@ class Game {
         });
     }
     draw() {
-        this.canvasHelper.Clear();
         if (this.leftPressed) {
             this.shipXOffset -= 2;
         }
@@ -226,13 +198,35 @@ class MenuView extends ViewBase {
     }
 }
 class GameView extends ViewBase {
-    constructor() {
-        super(...arguments);
+    constructor(aCanvas, aChangeViewCallback) {
+        super(aCanvas, aChangeViewCallback);
         this.player = "Player1";
         this.score = 400;
         this.lives = 3;
         this.HandleClick = () => { };
     }
-    RenderScreen() { }
+    RenderScreen() {
+        const lifeImagePath = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
+        for (let i = 0; i < this.lives; i++)
+            this.d_canvasHelper.writeImageToCanvas(lifeImagePath, 20 + 32 * i, 20, 0);
+        this.d_canvasHelper.writeTextToCanvas(`Score: ${this.score}`, 20, this.d_canvasHelper.GetWidth() - 150, 65, undefined, undefined, "right");
+        const asteroids = [
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big2.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big3.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big4.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_med3.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_small2.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny1.png",
+            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny2.png",
+        ];
+        const maxAsteroidsOnScreen = 5;
+        for (let i = 0; i < maxAsteroidsOnScreen; i++) {
+            const index = MathHelper.randomNumber(0, asteroids.length);
+            this.d_canvasHelper.writeImageToCanvas(asteroids[index], MathHelper.randomNumber(0, this.d_canvasHelper.GetWidth()), MathHelper.randomNumber(0, this.d_canvasHelper.GetHeight()));
+        }
+    }
 }
 //# sourceMappingURL=app.js.map

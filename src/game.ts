@@ -1,6 +1,7 @@
 class Game {
     //global attr for helpers
     private readonly canvasHelper: CanvasHelper;
+    private d_currentView: ViewBase;
 
     //some global player attributes
     private readonly player: string = "Player1";
@@ -34,78 +35,15 @@ class Game {
             }
         ]
 
-        // all screens: uncomment to activate
-        this.start_screen();
-        // this.level_screen();
-        // this.title_screen();
-
+        // render the current screen
+        this.d_currentView = new MenuView(canvasId, this.ChangeView)
+        this.d_currentView.Render();
     }
 
-    //-------- Splash screen methods ------------------------------------
-    /**
-     * Function to initialize the splash screen
-     */
-    public start_screen() {
-        const center = this.canvasHelper.GetCenter();
-
-        //1. add 'Asteroids' text
-        this.canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
-
-        //2. add 'Press to play' text
-        this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
-
-        //3. add button with 'start' text
-        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y+200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
-            this.canvasHelper.Clear();
-            this.level_screen();
-        });
-
-        //4. add Asteroid image
-        this.canvasHelper.writeImageToCanvas(
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-            center.X, center.Y
-        );
-    }
-
-    //-------- level screen methods -------------------------------------
-    /**
-     * Function to initialize the level screen
-     */
-    public level_screen() {
-        //1. load life images
-        const lifeImagePath = "./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png";
-
-        for (let i = 0; i < this.lives; i++)
-            this.canvasHelper.writeImageToCanvas(lifeImagePath, 20 + 32*i, 20, 0);
-
-        //2. draw current score
-        this.canvasHelper.writeTextToCanvas(`Score: ${this.score}`, 20, this.canvasHelper.GetWidth() - 150, 65, undefined, undefined, "right");
-
-        //3. draw random asteroids
-        const asteroids: Array<string> = [
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big2.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big3.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big4.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_med3.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_small2.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny1.png",
-            "./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_tiny2.png",
-        ];
-
-        const maxAsteroidsOnScreen: number = 5;
-
-        for (let i = 0; i < maxAsteroidsOnScreen; i++) {
-            const index = MathHelper.randomNumber(0, asteroids.length);
-
-            this.canvasHelper.writeImageToCanvas(
-                asteroids[index],
-                MathHelper.randomNumber(0, this.canvasHelper.GetWidth()),
-                MathHelper.randomNumber(0, this.canvasHelper.GetHeight())
-            );
-        }
+    private ChangeView(aNewView: ViewBase): void {
+        this.d_currentView.BeforeExit();
+        this.d_currentView = aNewView;
+        this.d_currentView.Render();    
     }
 
     //-------- Title screen methods -------------------------------------
@@ -137,7 +75,6 @@ class Game {
     //-------Generic canvas functions ----------------------------------
 
     private draw() {
-        this.canvasHelper.Clear();
 
         if (this.leftPressed) {
             this.shipXOffset -= 2;
