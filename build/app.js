@@ -26,7 +26,10 @@ class Game {
         const center = this.canvasHelper.GetCenter();
         this.canvasHelper.writeTextToCanvas("Asteroids", 140, center.X, 150);
         this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
-        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, console.log);
+        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y + 200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
+            this.canvasHelper.Clear();
+            this.level_screen();
+        });
         this.canvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png", center.X, center.Y);
     }
     level_screen() {
@@ -154,6 +157,10 @@ class CanvasHelper {
     writeButtonToCanvas(aCaption, aXpos, aYpos, aSrc = "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", aFontSize = 20, callback = null) {
         let buttonElement = new Image();
         buttonElement.addEventListener("load", () => {
+            if (aXpos < 0)
+                aXpos = this.GetCenter().X;
+            if (aYpos < 0)
+                aYpos = this.GetCenter().Y;
             this.ctx.drawImage(buttonElement, aXpos - buttonElement.width / 2, aYpos - buttonElement.height / 2);
             this.writeTextToCanvas(aCaption, aFontSize, aXpos, aYpos, "black", "middle");
         });
@@ -161,7 +168,7 @@ class CanvasHelper {
         if (!callback)
             return;
         this.canvas.addEventListener("click", (event) => {
-            if (event.x > aXpos - buttonElement.width / 2 && event.x < aXpos + buttonElement.width / 2 + 111) {
+            if (event.x > aXpos - buttonElement.width / 2 && event.x < aXpos + buttonElement.width / 2) {
                 if (event.y > aYpos - buttonElement.height / 2 && event.y < aYpos + buttonElement.height / 2) {
                     callback(event);
                 }
@@ -192,9 +199,9 @@ class MenuView extends ViewBase {
     constructor(aCanvas, aChangeViewCallback) {
         super(aCanvas, aChangeViewCallback);
         this.HandleClick = (aXpos, aYpos) => {
-            let centerCoordinate = this.d_canvasHelper.GetCenter();
-            if (aXpos > centerCoordinate.X - 111 && aXpos < centerCoordinate.X + 111) {
-                if (aYpos > centerCoordinate.Y + 219 && aYpos < centerCoordinate.Y + 259) {
+            const center = this.d_canvasHelper.GetCenter();
+            if (aXpos > center.X - 111 && aXpos < center.X + 111) {
+                if (aYpos > center.Y + 219 && aYpos < center.Y + 259) {
                     this.d_changeViewCallback(new GameView(this.d_canvasHelper.getCanvas(), this.d_changeViewCallback));
                 }
             }

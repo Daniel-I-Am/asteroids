@@ -143,7 +143,9 @@ class CanvasHelper {
     ) {
         let buttonElement = new Image();
 
-        buttonElement.addEventListener("load", () => {
+        buttonElement.addEventListener("load", (): void => {
+            if (aXpos < 0) aXpos = this.GetCenter().X;
+            if (aYpos < 0) aYpos = this.GetCenter().Y;
             this.ctx.drawImage(buttonElement, aXpos - buttonElement.width/2, aYpos - buttonElement.height/2);
             this.writeTextToCanvas(aCaption, aFontSize, aXpos, aYpos, "black", "middle");
         });
@@ -151,9 +153,8 @@ class CanvasHelper {
         buttonElement.src = aSrc;
 
         if (!callback) return;
-
         this.canvas.addEventListener("click", (event: MouseEvent) => {
-            if (event.x > aXpos - buttonElement.width/2 && event.x < aXpos + buttonElement.width/2 + 111) {
+            if (event.x > aXpos - buttonElement.width/2 && event.x < aXpos + buttonElement.width/2) {
                 if (event.y > aYpos - buttonElement.height/2 && event.y < aYpos + buttonElement.height/2) {
                     callback(event);
                 }

@@ -55,7 +55,10 @@ class Game {
         this.canvasHelper.writeTextToCanvas("PRESS PLAY TO START", 40, center.X, center.Y - 100);
 
         //3. add button with 'start' text
-        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y+200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, console.log);
+        this.canvasHelper.writeButtonToCanvas("Play!", center.X, center.Y+200, "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png", 20, () => {
+            this.canvasHelper.Clear();
+            this.level_screen();
+        });
 
         //4. add Asteroid image
         this.canvasHelper.writeImageToCanvas(

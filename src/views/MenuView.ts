@@ -13,10 +13,10 @@ class MenuView extends ViewBase
     }
 
     protected HandleClick = (aXpos: number, aYpos: number): void => {
-        // get the centerCoordinate
-        let centerCoordinate = this.d_canvasHelper.GetCenter();
-        if (aXpos > centerCoordinate.X - 111 && aXpos < centerCoordinate.X + 111) {
-            if (aYpos > centerCoordinate.Y + 219 && aYpos < centerCoordinate.Y + 259) {
+        // get the center
+        const center = this.d_canvasHelper.GetCenter();
+        if (aXpos > center.X - 111 && aXpos < center.X + 111) {
+            if (aYpos > center.Y + 219 && aYpos < center.Y + 259) {
                 // clear the canvas
 
                 // change the View << is explained tomorrow
