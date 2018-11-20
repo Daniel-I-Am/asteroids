@@ -125,8 +125,9 @@ class Game {
 }
 
 //this will get an HTML element. I cast this element in de appropriate type using <>
+let Asteroids;
 let init = function () {
-    const Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
+    Asteroids = new Game(<HTMLCanvasElement>document.getElementById('canvas'));
     // const Asteroids2 = new Game(<HTMLCanvasElement>document.getElementById('canvas2'));
     // const Asteroids3 = new Game(<HTMLCanvasElement>document.getElementById('canvas3'));
     // const Asteroids4 = new Game(<HTMLCanvasElement>document.getElementById('canvas4'));

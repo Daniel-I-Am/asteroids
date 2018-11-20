@@ -81,8 +81,9 @@ class Game {
         }
     }
 }
+let Asteroids;
 let init = function () {
-    const Asteroids = new Game(document.getElementById('canvas'));
+    Asteroids = new Game(document.getElementById('canvas'));
 };
 window.addEventListener('load', init);
 class CanvasHelper {
