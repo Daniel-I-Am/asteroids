@@ -1,4 +1,4 @@
-/// <reference path="..\helpers\CanvasHelper.ts"/>
+/// <reference path="../helpers/CanvasHelper.ts"/>
 
 /**
  * Base Class that is generic for all screen classes
@@ -10,7 +10,6 @@ abstract class ViewBase {
     protected readonly d_changeViewCallback: (aNewView: ViewBase) => void;
 
     /**
-     * Constructor
      * Creates the object and initializes the members
      * @param {HTMLCanvasElement} aCanvas - the canvas where to render to
      * @param aChangeViewCallback -
@@ -30,9 +29,8 @@ abstract class ViewBase {
     }
 
     /**
-     * OnClick
-     * @AccessModifier {Private}
      * Handles the internal redirection of the click event.
+     * @access private
      * @param {number} aXaxis - the x position of the click event
      * @param {number} aYaxis - the y position of the click event
      */
@@ -47,9 +45,8 @@ abstract class ViewBase {
     //    }
 
     /**
-     * Render
-     * @AccessModifier {Public}
      * Handles the drawing of screens in general
+     * @access public
      */
     public Render(): void {
         this.d_canvasHelper.Clear();
@@ -57,9 +54,8 @@ abstract class ViewBase {
     }
 
     /**
-     * BeforeExit
-     * @AccessModifier {Public}
      * Handles the cleanup
+     * @access public
      */
     public BeforeExit(): void {
         // Clear any lingering events.
@@ -71,27 +67,17 @@ abstract class ViewBase {
     // -------- Method declarations to be implemented in the derived class ----------------
     // ------------------------------------------------------------------------------------
     /**
-     * OnClick
-     * @AccessModifier {Protected}
      * Handles the internal redirection of the click event.
-     * @param {number} X - the x position of the mouseclick
-     * @param {number} Y - the class containing information for the event
-     */
-    // deprecated >> is nolonger needed by the click registration in the canvas helper
-    // protected abstract HandleClick(X: number, Y: number): void;
-
-    /**
-     * RenderScreen
-     * @AccessModifier {Protected}
-     * Handles the internal redirection of the click event.
+     * @access protected
      * @param {MouseEvent} Event - the class containing information for the event
+     * @abstract
      */
     protected abstract RenderScreen(): void;
 
     /**
-     * Cleanup
-     * @AccessModifier {Protected}
      * Handles all the actions before the class goes out of scope
+     * @access protected
+     * @abstract
      */
     protected abstract Cleanup(): void;
 }
