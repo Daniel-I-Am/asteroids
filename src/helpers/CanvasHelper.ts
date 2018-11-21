@@ -1,158 +1,223 @@
 class CanvasHelper {
 
-    private readonly canvas: HTMLCanvasElement;
-    private readonly ctx: CanvasRenderingContext2D; //this was a bit tricky to find
+    // changed from public to private
+    private readonly d_canvas: HTMLCanvasElement;
+    private readonly d_context: CanvasRenderingContext2D; //this was a bit tricky to find
 
-    /**
-     * Constructor of the class
-     * @param aCanvas The canvas to help with
-     */
-    public constructor(aCanvas: HTMLCanvasElement, aWidth: number = -1, aHeight: number = -1) {
-        this.canvas = aCanvas;
-        this.ctx = aCanvas.getContext('2d');
-        this.canvas.width = (aWidth<0 ? window.innerWidth : aWidth);
-        this.canvas.height = (aHeight<0 ? window.innerHeight : aHeight);
+    private d_clickCommands: Map<string, ButtonAction> = new Map<string, ButtonAction>();
+
+
+    // THIS CLASS NOW IMPLEMENTS THE SINGLETON PATTERN.
+    // THE SINGELTON PATTERN IS HELPFULL WHEN THERE ARE RESOURCES
+    // WE WOULD LIKE TO SHARE AMONG ALL THE USERS OF THIS RESOURCE
+    // AS WE WORK WITH ONE SINGLE CANVAS WE NEED TO HAVE ANYBODY THAT USES
+    // THIS HELPER CLASS TO TALK TO THE SAME INSTANCE.
+    //
+    // singleton.. because we only want one class to write to / read from the canvas
+    //
+    // FIRSTLY WE CREATE A STATIC VARIABLE CALLED INSTANCE AND INITIALIZE THIS TO NULL
+    // STATIC MEANS THAT THERE IS ALWAYS EXACTLY 1 OF THIS VARIABLE. IF WE HAVE NO INSTANCE CREATED
+    // THERE IS ALREADY 1 VERSION AVAILABLE, WITH EACHT NEW INSTANCE OF THIS CLASS THE STATIC PARTS
+    // WILL STILL BE 1 TIME AROUND.
+    //
+    // THINK OF THIS AS YOU OWN A CAR.. THE CAR IS THERE WHETHER YOU DRIVE IT OR NOT.
+    // IF YOU'D LEND YOUR CAR TO ANOTHER PERSON HE WILL RECEIVE THE SAME INSTANCE (NOT A COPY OR A
+    // NEWLY CREATED CAR THAT LOOKS THE SAME). IT WILL BE EXACTLY THE SAME
+    private static instance: CanvasHelper = null;
+
+    // WE ALSO CREATE A PUBLIC STATIC METHOD, WHICH HOLDS THE SAME RULES AS THE VARIABLE
+    // THIS METHOD CAN BE CALLED.. THE METHOD WILL LOOK AT THE INSTANCE VARIABLE AND IF
+    // IT IS NULL IT WILL CREATE A NEW INSTANCE. THIS WILL ONLY HAPPEN THE FIRST TIME
+    // THE METHOD IS CALLED. ALL THE OTHER CASES THE INSTANCE IS ALREADY THERE AND IT WILL
+    // BE RETURNED. THIS WAY EVERY CLASS THAT NEEDS HELP WITH THE CANVAS GETS THE SAME CLASS
+    // TO HELP
+    public static Instance(aCanvas: HTMLCanvasElement = null): CanvasHelper {
+
+        if (this.instance == null) {
+            if (aCanvas == null) {
+                throw new DOMException("The first time the instance is created a Canvas must be given.");
+            }
+            this.instance = new CanvasHelper(aCanvas);
+        }
+        return this.instance;
     }
 
+    // end of singleton
+
     /**
-     * A Callback
-     * @param aCallBack Callback function
+     * constructor
+     * @AccessModifier {public}
+     * Clears the canvas
+     * @param {HTMLCanvasElement} aCanvas - the canvas to help with
      */
-    public RegisterOnClick(aCallBack: (x_axis: number, y_axis: number) => void) {
-        // register an event listener to handle click events
-        this.canvas.addEventListener('click', (aEvent: MouseEvent) => {
-            // when this event is handles call the local OnClick method.
-            aCallBack(aEvent.x, aEvent.y);
+    // THE CONSTRUCTOR IS CHANGED FROM PUBLIC TO PRIVATE.
+    // THIS IS REQUIRED WHEN WE WORK WITH SINGLETONS.
+    private constructor(aCanvas: HTMLCanvasElement) {
+        // bind the passed argument to the local member
+        //construct all canvas
+        this.d_canvas = aCanvas;
+
+        // get the context from the canvas
+        this.d_context = this.d_canvas.getContext('2d');
+
+        document.addEventListener('click', (event: any) => {
+            this.OnClick(event);
         });
     }
 
     /**
-     * Clears screen
+     *
+     * @param Event
+     * @constructor
+     */
+    public OnClick(Event: any) {
+        let X = Event.x;
+        let Y = Event.y;
+
+        this.d_clickCommands.forEach((value: ButtonAction, key: string) => {
+            value.ExecuteIfInArea(X, Y);
+        });
+    }
+
+    /**
+     * Clear
+     * @AccessModifier {public}
+     * Clears the canvas
      */
     public Clear(): void {
         // clear the screen
-        this.ctx.clearRect(0, 0, this.GetWidth(), this.GetHeight());
+        this.d_context.clearRect(0, 0, this.GetWidth(), this.GetHeight());
     }
 
     /**
-     * Get the center of the canvas
+     * GetCanvas
+     * @AccessModifier {public}
+     * Getter to provide access to the canvas
      */
-    public GetCenter(): {X: number, Y: number} {
+    public GetCanvas(): HTMLCanvasElement {
+        return this.d_canvas;
+    }
+
+    /**
+     * GetCenter
+     * @AccessModifier {public}
+     * returns the center coordinate
+     */
+    public GetCenter(): { X: number, Y: number } {
         // return the center as a valid return
-        return {X: this.GetWidth()/2, Y: this.GetHeight()/2};
+        return {X: this.GetWidth() / 2, Y: this.GetHeight() / 2};
     }
 
     /**
-     * Get the width of the canvas
-     */
-    public GetWidth(): number {
-        // return the height of the canvas
-        return this.canvas.width;
-    }
-
-    /**
-     * Get the height of the canvas
+     * GetHeight
+     * @AccessModifier {public}
+     * returns Height of the canvas
      */
     public GetHeight(): number {
-        // return the height of te canvas
-        return this.canvas.height;
+        // return the height of the canvas
+        return this.d_canvas.height;
     }
 
     /**
-     * Get the canvas the helper uses
+     * GetWidth
+     * @AccessModifier {public}
+     * returns the Width of the canvas
      */
-    public getCanvas(): HTMLCanvasElement {
-        return this.canvas;
+    public GetWidth(): number {
+        // return the width of the canvas
+        return this.d_canvas.width;
+    }
+
+    public UnregisterClickListener(fnName: string): void {
+        this.d_clickCommands.delete(fnName);
     }
 
     /**
-     * Writes text to canvas
-     * @param text Text to write
-     * @param fontSize font size to use
-     * @param aXpos x-position of text
-     * @param aYpos y-position of text
-     * @param color color to use
-     * @param fontFamily font family to use
-     * @param alignment Textalignment to use
+     * writeTextToCanvas
+     * @AccessModifier {public}
+     * Handles the internal redirection of the click event.
+     * @param {string} text -
+     * @param {number} fontSize -
+     * @param {number} aXpos -
+     * @param {number} aYpos -
+     * @param {string} color -
+     * @param {CanvasTextAlign} alignment -
      */
-    public writeTextToCanvas(
-        text: string,
-        fontSize: number,
-        aXpos: number,
-        aYpos: number,
-        color: string = "white",
-        aTextBaseLine: CanvasTextBaseline = "bottom",
-        fontFamily: string = "Minecraft",
-        alignment: CanvasTextAlign = "center"
-    ) {
-        this.ctx.fillStyle = color;
-        this.ctx.font = `${fontSize}px ${fontFamily}`;
-        this.ctx.textAlign = alignment;
-        this.ctx.textBaseline = aTextBaseLine;
-        this.ctx.fillText(text, aXpos, aYpos);
+    public writeTextToCanvas(aText: string,
+                             aFontSize: number,
+                             aXpos: number,
+                             aYpos: number,
+                             aColor: string = "white",
+                             aAlignment: CanvasTextAlign = "center") {
+
+        this.d_context.font = `${aFontSize}px Minecraft`;
+        this.d_context.fillStyle = aColor;
+        this.d_context.textAlign = aAlignment;
+        this.d_context.fillText(aText, aXpos, aYpos);
     }
 
     /**
-     * Puts an image on a point, centered around x and y
-     * @param aSrc Source of image to use
-     * @param aXpos x-position center image
-     * @param aYpos y-position center image
-     * @param rot rotation of image
+     * writeTextToCanvas
+     * @AccessModifier {public}
+     * Handles the internal redirection of the click event.
+     * @param {string} aSrc - the source of the resource
+     * @param {number} aXpos - the x axis value of the coordinate
+     * @param {number} aYpos - the y axis value of the coordinate
      */
-    public writeImageToCanvas(
-        aSrc: string,
-        aXpos: number,
-        aYpos: number,
-        rot: number = 0,
-    ) {
-        //TODO: uncomment and fix spriteMapData
-        /*let image = this.spriteMapData.filter(obj => {
-            return obj.name === aSrc
-        })[0];
-        if (!image) return null;
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        this.ctx.rotate(rot*Math.PI/180);
-        if (shouldCenter)
-            this.ctx.translate(-image.width/2, -image.height/2);
-        this.ctx.drawImage(this.spriteMapImage, image.x, image.y, image.width, image.height, 0, 0, image.width, image.height);
-        this.ctx.restore(); 
-        return image;*/
-        let element = new Image();
-        element.addEventListener("load", () => {
-            this.ctx.drawImage(element, aXpos-element.width/2, aYpos-element.height/2);
-        });
-        element.src = aSrc;
-    }
+    public writeImageToCanvas(aSrc: string,
+                              aXpos: number,
+                              aYpos: number) {
 
-    /**
-     * Adds a button to the canvas
-     * @param aCaption Caption to put on button
-     * @param aXpos x-position of center button
-     * @param aYpos y-position of center button
-     * @param aSrc Source location of button image
-     * @param callback Callback to fire when button is clicked
-     */
-    public writeButtonToCanvas(
-        aCaption: string, 
-        aXpos: number, 
-        aYpos: number, 
-        aSrc: string = "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png",
-        aFontSize: number = 20,
-        callback: (aXpos: number, aYpos: number) => void = null,
-    ) {
-        let buttonElement = new Image();
+        let image = new Image();
 
-        buttonElement.addEventListener("load", (): void => {
-            if (aXpos < 0) aXpos = this.GetCenter().X;
-            if (aYpos < 0) aYpos = this.GetCenter().Y;
-            this.ctx.drawImage(buttonElement, aXpos - buttonElement.width/2, aYpos - buttonElement.height/2);
-            this.writeTextToCanvas(aCaption, aFontSize, aXpos, aYpos, "black", "middle");
+        // add the listener so the waiting will not affect the change
+        image.addEventListener('load', () => {
+            this.d_context.drawImage(image, aXpos, aYpos);
         });
 
-        buttonElement.src = aSrc;
-
-        if (!callback) return;
-        this.RegisterOnClick(callback);
+        // load the source in the image.
+        image.src = aSrc;
     }
+
+    /**
+     *     /**
+     * writeButtonToCanvas
+     * @AccessModifier {public}
+     * Creates a button with a given text and set the callback
+     *      providing a callback is mandatory for the button has no use
+     *      withoud the callback.
+     * @param aCaption - the caption to write
+     * @param fnName -  the registerd name of the callback
+     * @param fn - the callback method (click if the location of the button is clicked)
+     * @param aXpos - the left top x position of the button
+     * @param aYpos - the left top y position of the button
+     */
+    public writeButtonToCanvas(aCaption: string, fnName: string, fn: () => void, aXpos: number = -1, aYpos: number = -1) {
+        let buttonImage = new Image();
+        buttonImage.src = "./assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png";
+        // Make sure the image is loaded first otherwise nothing will draw.
+
+        buttonImage.addEventListener('load', (): void => {
+            let dx = aXpos;
+            let dy = aYpos;
+            // if x axis is not set, lets center the button horizontally
+            if (dx < 0) dx = (this.GetWidth() - buttonImage.width) / 2;
+            // if y axis is not set, lets center the button vertically
+            if (dy < 0) dy = this.GetHeight() / 2 + buttonImage.height;
+
+            // center the text based upon the font
+            let fontX = dx + ((buttonImage.width + aCaption.length - 18) / 2); // - 1/2 fontsize + buttonBorder
+            let fontY = dy + (buttonImage.height - 12); // - 1/2 fontsize + buttonBorder
+            this.d_context.drawImage(buttonImage, dx, dy);
+            this.writeTextToCanvas(aCaption, 20, fontX, fontY, '#000');
+
+            // check if there is a valid callback given
+            // if the callback is valid store the callback in the Map
+            if (fn != null) {
+                this.d_clickCommands.set(fnName, new ButtonAction(dx, dy, buttonImage.height, buttonImage.width, fn));
+            }
+        });
+    }
+
+
 }
