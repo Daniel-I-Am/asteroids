@@ -60,58 +60,6 @@ class Game {
         this.d_currentView = aNewView;
         this.d_currentView.Render();
     }
-
-    //-------Generic canvas functions ----------------------------------
-
-    private draw() {
-        this.ctx.clearRect(this.shipXOffset, this.shipYOffset, this.canvas.width, this.canvas.height);
-
-        if (this.leftPressed) {
-            this.shipXOffset -= 2;
-        }
-        if (this.upPressed) {
-            this.shipYOffset -= 2;
-        }
-        if (this.rightPressed) {
-            this.shipXOffset += 2;
-        }
-        if (this.downPressed) {
-            this.shipYOffset += 2;
-        }
-
-        //4. draw player spaceship
-        this.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", this.canvas.width / 2 + this.shipXOffset, this.canvas.height / 2 + this.shipYOffset);
-    }
-
-    private keyDownHandler(event: KeyboardEvent) {
-        if (event.keyCode == 37) {
-            this.leftPressed = true;
-        }
-        if (event.keyCode == 38) {
-            this.upPressed = true;
-        }
-        if (event.keyCode == 39) {
-            this.rightPressed = true;
-        }
-        if (event.keyCode == 40) {
-            this.downPressed = true;
-        }
-    }
-
-    private keyUpHandler(event: KeyboardEvent) {
-        if (event.keyCode == 37) {
-            this.leftPressed = false;
-        }
-        if (event.keyCode == 38) {
-            this.upPressed = false;
-        }
-        if (event.keyCode == 39) {
-            this.rightPressed = false;
-        }
-        if (event.keyCode == 40) {
-            this.downPressed = false;
-        }
-    }
 }
 
 //this will get an HTML element. I cast this element in de appropriate type using <>
